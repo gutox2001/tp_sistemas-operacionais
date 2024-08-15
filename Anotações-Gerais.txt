@@ -1,0 +1,68 @@
+Sobre sistemas operacionais:
+    https://www.programacaoprogressiva.net/2014/09/A-Chamada-de-Sistema-fork-Como-Criar-e-Gerenciar-Processos.html#google_vignette
+
+Funções que devem ser criadas:
+    -criar processo;
+    -substituir a imagem atual do processo com uma imagem nova do processo;
+    -transição de estado do processo;
+    -escalonamento de processos;
+    -troca de contexto.
+
+Conceitos importantes:
+    - Pipe
+    
+
+Sobre chamadas de sistema:
+    http://www.inf.ufes.br/~rgomes/so_fichiers/roteiro1.pdf
+
+
+    Criar processo filho idêntico ao pai:
+        chamada fork()
+            Quando criamos um processo por meio do fork(), dizemos que esse novo processo é o filho, e processo pai é aquele que chamou o fork(). Quando usamos o fork() , será criado o processo filho, que será idêntico ao pai, inclusive tendo as mesmas variáveis, registros, descritores de arquivos etc. Ou seja, o processo filho é uma cópia do pai, “exatamente” igual. As aspas aqui deve-se ao seguinte: na verdade não será exatamente igual, já que algumas informações de controle (presentes no bloco de controle do processo filho) serão diferentes... como o caso do PID ou do PPID (parent PID).
+
+    Comunicação entre processos:
+        chamada pipe()
+            https://www.youtube.com/watch?v=mDuutWI3d34
+            https://www.youtube.com/watch?v=y8e8HP2b268
+            O pipe é um mecanismo de comunicação entre processos no sistema operacional. Ele permite que um processo envie dados para outro processo de forma unidirecional, criando um canal de comunicação entre eles.
+
+Comunicação com outros módulos:
+    Comunicação com Processo Simulado:
+        B: Função que bloqueia processo por n unidades de tempo
+
+        T: Função que termina um processo Simulado
+
+        F: Função que cria um processo filho idêntico ao pai e que execute a instrução imediatamente após a instrução F
+
+        R: Substitui o programa do processo pelo programa passado como parâmetro
+
+
+    Comunicação com Processo controle:
+
+Estrutura de dados:
+    -Tempo: Contém o tempo atual do sistema
+    -Cpu: Contém o tempo de uso da CPU
+    -TabelaDeProcessos: Contém a tabela de processos
+    -EstadoPronto: Contém a lista de processos prontos
+    -EstadoBloqueado: Contém a lista de processos bloqueados
+    -EstadoExecução: Contém o processo em execução
+
+    Tempo:
+        é um valor inteiro inicializado para zero. A cada unidade de tempo, o valor de Tempo é incrementado em uma unidade.
+
+    CPU:
+        é usado para simular a execução de um processo simulado que está em estado de execução. Deve incluir membros de dados para armazenar um ponteiro para o vetor de programa, valor atual de contador de programa, e ponteiro para o vetor que simula a memória das estruturas de dados e fatia de tempo desse processo simulado. Ou seja, é como se esta estrutura possuísse registradores para armazenar estes dados, e enquanto estiver em execução, tudo deve ser acessado a partir destes registradores, e só depois, numa troca de contexto, é que deveria ser copiado de volta às estruturas do processo e da TabelaDeProcessos. Além disso, ele deve guardar o número de unidades de tempo usadas, até então, na fatia (quantum) de tempo atual.
+
+    Tabela de Processos:
+        é um vetor com uma entrada para cada processo simulado que ainda não terminou a sua execução. Cada entrada deve incluir membros de dados para armazenar identificador do processo, identificador do processo pai, um ponteiro para o valor de contador de programa (inicialmente 0), ponteiro para o vetor de estruturas de dados, prioridade, estado, tempo de início e tempo de CPU, usados, até então.
+
+    Estado Pronto:
+        armazena todos os processos simulados (índices de TabelaDeProcessos) que estão prontos para executar. Isso pode ser implementado usando uma estrutura de dados de uma fila ou de uma fila de prioridades. 
+        
+    EstadoBloqueado: 
+        armazena todos os processos (índices de TabelaDeProcessos) que estão bloqueados no momento. Isso pode ser implementado com uma estrutura de dados de uma fila. 
+    
+    EstadoExecução:
+        armazena o índice de TabelaDeProcessos do processo simulado, atualmente em execução.
+
+

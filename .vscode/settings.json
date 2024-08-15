@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "control_process.h": "c",
+        "fila.h": "c",
+        "process_manager.h": "c",
+        "types.h": "c",
+        "stdio.h": "c",
+        "simulated_process.h": "c",
+        "process_table.h": "c",
+        "stdlib.h": "c"
+    }
+}
