@@ -19,18 +19,19 @@ void initialize_table(ProcessTable *process_table) {
 }
 
 // Função para criar um novo item de processo
-ItemProcess create_new_item_process(pid_t parent_id, SimulatedProcess simulated_process, int priority, ProcessTable *process_table) {
+void create_new_item_process(pid_t parent_id, int program_counter, SimulatedProcess simulated_process, int priority, ProcessTable *process_table) {
     ItemProcess new_item; // Cria um novo item de processo
     new_item.id = get_first_empty_position(process_table); // Atribui o ID do processo atual
     new_item.parent_id = parent_id; // Define o ID do processo pai
-    new_item.program_counter = 0; // Inicializa o contador de programa
+    new_item.program_counter = program_counter; // Inicializa o contador de programa
     new_item.simulated_process = simulated_process; // Define o processo simulado
     new_item.priority = priority; // Define a prioridade
     new_item.process_state = Pronto; // Inicializa o estado do processo como "Pronto"
     new_item.start_time = 0; // Inicializa o tempo de início
     new_item.cpu_time = 0; // Inicializa o tempo de CPU
 
-    return new_item; // Retorna o novo item de processo
+    add_process_to_table(new_item, process_table);
+    printf("Processo criado e adicionado com sucesso a tabela. ID: %d\n", new_item.id);
 }
 
 // Função para verificar se a tabela de processos está vazia
@@ -68,15 +69,21 @@ void remove_process_from_table(int indexToRemove, ProcessTable *process_table) {
 
 // Função para exibir a tabela de processos
 void show_process_table(ProcessTable process_table) {
-    printf("Tabela de Processos:\n");
+    printf("+----+------+------------+--------+\n");
+    printf("| ID | Pai  | Prioridade | Estado |\n");
+    printf("+----+------+------------+--------+\n");
+    
     for (int i = 0; i < process_table.last_item; i++) {
-        printf("ID: %d, Pai: %d, Prioridade: %d, Estado: %d\n", 
-               process_table.item_process[i].id, 
-               process_table.item_process[i].parent_id, 
-               process_table.item_process[i].priority, 
+        printf("| %-2d | %-4d | %-10d | %-6d |\n",
+               process_table.item_process[i].id,
+               process_table.item_process[i].parent_id,
+               process_table.item_process[i].priority,
                process_table.item_process[i].process_state);
     }
+    
+    printf("+----+------+------------+--------+\n");
 }
+
 
 int get_first_empty_position(ProcessTable *process_table) {
     for (int i = 0; i < MAX_TAM; i++) {

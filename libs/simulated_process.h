@@ -17,7 +17,7 @@ typedef struct Instruction {
 
 typedef struct SimulatedProcess {
     int int_quantity;
-    int process_id;
+    pid_t process_id;
     int* memory;   // Ponteiro para vetor de inteiros que corresponde à memória
     int program_counter;  // contador de instrucao do processo
     int instruction_quantity;

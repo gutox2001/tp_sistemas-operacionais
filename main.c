@@ -8,6 +8,7 @@ int main() {
 
     do {
         show_main_menu();
+        scanf("%d", &type_input);
 
         switch (type_input) {
             case 1:
@@ -24,7 +25,6 @@ int main() {
         }
     } while (type_input != 1 && type_input != 2);
 
-    read_terminal_input(&string_input);
-
+    initialize_control_process(type_input, type_escalonamento, string_input);
     return 1;
 }

@@ -7,6 +7,9 @@
         "stdio.h": "c",
         "simulated_process.h": "c",
         "process_table.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "string.h": "c",
+        "typeinfo": "c",
+        "cpu.h": "c"
     }
 }

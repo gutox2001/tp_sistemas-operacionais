@@ -1,6 +1,6 @@
 # Regra padrão: compilar e executar
 all:
-	gcc ./src/*.c -o app.out
+	gcc main.c ./src/*.c -o app.out
 	./app.out
 
 test:

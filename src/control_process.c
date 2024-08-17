@@ -1,19 +1,28 @@
 #include "../libs/control_process.h"
 
-void initialize_control_process(int type_input, int type_escalonamento, char *string_input) {
+void initialize_control_process(int type_input, int type_escalonamento, char *send_string) {
     clock_t start = clock();
-    clock_t end;
 
     int fd[2];  // Pipe para comunicação entre pai e filho
     pid_t pid;
 
+    Memory memory;                             // Memória do sistema
     CPU CPU_list[QUANT_CPU];
     ProcessManager process_manager;            // Gerenciador de processos do sistema
     SimulatedProcess first_simulated_process;  // Primeiro processo simulado que será executado
     ItemProcess new_item_process;              // Item processo da tabela de processos
-    TypeItem new_item;                         // Item da fila
+    TypeItem new_item;                         // Item da fila de processos
 
-    // int removidoBloqueado, removidoPronto;
+    // Inicializa a memória do sistema
+    initialize_memory(&memory);
+
+    for (int i = 0; i < QUANT_CPU; i++)
+    {
+        int index_mem_init = (50 * i);
+        int index_mem_end = index_mem_init + 50;
+        initialize_cpu(&CPU_list[i], &memory, index_mem_init, index_mem_end);
+    }
+    
 
     /* Criando nosso Pipe */
     if (pipe(fd) == -1) {
@@ -34,21 +43,38 @@ void initialize_control_process(int type_input, int type_escalonamento, char *st
         /*No pai, vamos ESCREVER, então vamos fechar a LEITURA do Pipe neste lado*/
         close(fd[0]);
 
-        write(fd[1], string_input, sizeof(string_input));
+        write(fd[1], send_string, sizeof(send_string));
         // close(fd[1]); // Fechar o pipe de escrita após a conclusão
     }
 
     else {  // Processo filho
         printf("Esse é o processo filho. \n");
-        char string_recebida[TAM_MAX_MNS] = "";
+        char receive_string[TAM_MAX_MNS] = "";
 
         close(fd[1]);
-        read(fd[0], string_recebida, sizeof(string_recebida));
-        printf("%s", string_recebida);
+        read(fd[0], receive_string, sizeof(receive_string));
+        printf("Comandos recebidos: %s\nO sistema será inicializado.\n", receive_string);
+        printf("*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_\n");
+        
 
         // Inicializa o gerenciador de processos
         initialize_process_manager(&process_manager, CPU_list);
+
+        // Instancia o primeiro processe simulado
+        first_simulated_process = initialize_simulated_process("data/init.txt");
+        // Percorre a string de entrada passando os comandos para o gerenciador de processos
+        create_new_item_process(pid, 0, first_simulated_process, 0, &process_manager.process_table);
+        
+        
+        return;
     }
+
+        clock_t end = clock();
+
+         // Calcula o tempo decorrido em segundos
+        double tempo_de_execucao = (double)(end - start) / CLOCKS_PER_SEC;
+
+        show_control_process(tempo_de_execucao);
 }
 
 void mostrar_menu_escalonamento() {
@@ -129,3 +155,11 @@ void read_arq(char *retorno) {
 
 //     *pw = '\0';
 // }
+
+void show_control_process(double execution_time) {
+    printf("====================================\n");
+    printf("|          Processo de Controle    |\n");
+    printf("====================================\n");
+    printf("| Tempo de execução da aplicação: %.2f segundos |\n", execution_time);
+    printf("====================================\n");
+}

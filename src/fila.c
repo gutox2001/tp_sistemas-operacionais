@@ -1,97 +1,110 @@
 #include "../libs/fila.h"
 
-void initialize_empty_fila(TypeFila *fila, char *name) {
-    // Inicializa a fila vazia
+void initialize_empty_fila(TypeFila *fila) {
     fila->start = (Cell *)malloc(sizeof(Cell));
     if (fila->start == NULL) {
         fprintf(stderr, "Erro ao alocar memória para a fila.\n");
         exit(EXIT_FAILURE);
     }
-    fila->end = fila->start; // O início e o fim da fila apontam para a mesma célula inicialmente
-    fila->start->next_cell = NULL; // A próxima célula é NULL, indicando que a fila está vazia
-    strncpy(fila->name, name, sizeof(fila->name) - 1); // Copia o nome da fila
-    fila->name[sizeof(fila->name) - 1] = '\0'; // Garante que a string esteja terminada
+    fila->end = fila->start;
+    fila->start->next_cell = NULL;
 }
 
 int is_fila_empty(TypeFila fila) {
-    // Verifica se a fila está vazia
     return (fila.start == fila.end);
 }
 
 void add_item_to_fila(TypeItem new_item, TypeFila *fila) {
-    // Adiciona um novo item à fila, mantendo a ordem por prioridade
-    Cell *new_cell = (Cell *)malloc(sizeof(Cell));
+    Cell *new_cell, *temp_current_cell, *temp_next_cell;
+    
+    new_cell = (Cell *)malloc(sizeof(Cell));
     if (new_cell == NULL) {
         fprintf(stderr, "Erro ao alocar memória para nova célula.\n");
         exit(EXIT_FAILURE);
     }
-    new_cell->item = new_item; // Armazena o novo item na nova célula
-    new_cell->next_cell = NULL; // Inicializa a próxima célula como NULL
 
-    // Busca a posição correta para inserir o novo item
-    Cell *current = fila->start;
-    Cell *previous = NULL;
-
-    while (current != NULL && current->item.priority <= new_item.priority) {
-        previous = current;
-        current = current->next_cell;
-    }
-
-    // Insere o novo item na posição correta
-    if (previous == NULL) {
-        // Inserção no início da fila
-        new_cell->next_cell = fila->start->next_cell;
-        fila->start->next_cell = new_cell;
+    if (is_fila_empty(*fila)) {
+        new_cell->index = 0;
     } else {
-        // Inserção após a célula anterior
-        previous->next_cell = new_cell;
-        new_cell->next_cell = current;
+        new_cell->index = fila->end->index + 1;
+    }
+    
+    new_cell->item = new_item;
+    new_cell->next_cell = NULL;
+
+    temp_current_cell = fila->start;
+    temp_next_cell = fila->start->next_cell; // Corrigido para iniciar do primeiro item válido
+
+    while (temp_next_cell != NULL && temp_next_cell->item.priority < new_item.priority) {
+        temp_current_cell = temp_next_cell;
+        temp_next_cell = temp_next_cell->next_cell;
     }
 
-    // Atualiza o final da fila se necessário
-    if (current == NULL) {
-        fila->end = new_cell; // Atualiza o fim da fila
+    new_cell->next_cell = temp_next_cell;
+    temp_current_cell->next_cell = new_cell;
+
+    if(temp_next_cell == NULL) {
+        fila->end = new_cell; // Corrigido para apontar para a nova célula adicionada
     }
+
+    printf("Item adicionado na fila com sucesso! Índice na fila: %d\n", fila->end->index);
 }
 
 int remove_item_from_fila(TypeFila *fila) {
-    // Remove e retorna o índice do item mais prioritário da fila
     if (is_fila_empty(*fila)) {
         printf("Erro: a fila está vazia.\n");
-        return -1; // Retorna erro se a fila estiver vazia
+        return -1;
     }
 
-    Cell *aux = fila->start->next_cell; // O item a ser removido está após a célula de início
+    Cell *aux = fila->start->next_cell;
     if (aux == NULL) {
-        return -1; // Caso não exista item para remover
+        return -1;
     }
 
-    fila->start->next_cell = aux->next_cell; // Avança o início da fila
-    int index = aux->item.index_process_table; // Armazena o índice do item removido
-    free(aux); // Libera a memória da célula removida
+    fila->start->next_cell = aux->next_cell;
+    int index = aux->item.process_table_index;
+    free(aux);
 
-    // Se a fila estiver vazia após a remoção, atualiza o final
     if (fila->start->next_cell == NULL) {
-        fila->end = fila->start; // Atualiza o fim da fila
+        fila->end = fila->start;
     }
 
-    return index; // Retorna o índice do item removido
+    return index;
 }
 
-void show_fila(TypeFila fila) {
-    // Exibe os itens da fila
-    printf("Imprimindo fila: %s\n", fila.name);
-    Cell *aux = fila.start->next_cell; // Começa a partir da primeira célula
+void show_fila(TypeFila *fila) {
+    printf("Imprimindo fila...\n");
+    Cell *aux = fila->start->next_cell; // Corrigido para começar a partir do primeiro item válido
 
-    if (is_fila_empty(fila))
-    {
+    if (is_fila_empty(*fila)) {
         printf("Essa fila está vazia!\n");
         return;
     }
 
     while (aux != NULL) {
-        printf("Indice na tabela de processos: %d\n", aux->item.index_process_table);
-        printf("Prioridade: %d\n", *aux->item.priority); // Acessa diretamente a prioridade
-        aux = aux->next_cell; // Avança para a próxima célula
+        printf("Dados do Item:\n");
+        printf("Índice na fila: %d\n", aux->index);
+        printf("Prioridade: %d\n", *aux->item.priority);
+        aux = aux->next_cell;
+    }
+}
+
+void sort_fila_by_priority(TypeFila *fila) {
+    Cell *current_cell, *next_cell;
+    TypeItem temp_item;
+    int temp_index;
+
+    for (current_cell = fila->start->next_cell; current_cell != NULL; current_cell = current_cell->next_cell) {
+        for (next_cell = current_cell->next_cell; next_cell != NULL; next_cell = next_cell->next_cell) {
+            if (*current_cell->item.priority > *next_cell->item.priority) {
+                temp_item = current_cell->item;
+                current_cell->item = next_cell->item;
+                next_cell->item = temp_item;
+
+                temp_index = current_cell->index;
+                current_cell->index = next_cell->index;
+                next_cell->index = temp_index;
+            }
+        }
     }
 }
