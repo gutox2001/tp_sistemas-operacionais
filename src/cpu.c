@@ -17,6 +17,8 @@ void add_process_to_cpu(CPU *cpu, ItemProcess *process) {
     cpu->program_counter = process->simulated_process.program_counter;
 
     printf("Processo de ID %d adicionado da CPU.\n", cpu->actual_process->simulated_process.process_id);
+    show_cpu(*cpu);
+    return;
 }
 
 int is_cpu_empty(CPU *cpu) {
@@ -46,38 +48,39 @@ void clean_cpu(CPU *cpu) {
     cpu->quant_int = 0;
     cpu->quantum = 0;
 
-    printf("Processo de ID %d retirado da CPU.\nTempo de CPU usado até o momento: %d und de tempo.\n", temp_id, cpu->used_time);
+    printf("\nProcesso de ID %d retirado da CPU.\nTempo de CPU usado até o momento: %d und de tempo.\n", temp_id, cpu->used_time);
     printf("***************************************\n");
 }
 
+// Função para exibir o estado da CPU
 void show_cpu(CPU cpu) {
-    printf("====================================\n");
-    printf("|               CPU                |\n");
-    printf("====================================\n");
-    printf("| Program Counter       : %d       |\n", cpu.program_counter);
-    printf("| Quantidade de inteiros: %d       |\n", cpu.quant_int);
-    printf("| Tempo de fatia de tempo: %d      |\n", cpu.quantum);
-    printf("| Tempo de uso          : %d       |\n", cpu.used_time);
-    printf("| Índice de início da memória: %d  |\n", cpu.index_mem_init);
-    printf("| Índice de fim da memória: %d     |\n", cpu.index_mem_end);
-    printf("====================================\n");
+    printf(BOLD "\n====================================\n" RESET);
+    printf(BOLD "|               CPU                |\n" RESET);
+    printf(BOLD "====================================\n" RESET);
+    printf(BOLD "| Program Counter       : " YELLOW "%-7d" RESET "|\n", cpu.program_counter);
+    printf(BOLD "| Quantidade de inteiros: " GREEN "%-7d" RESET "|\n", cpu.quant_int);
+    printf(BOLD "| Tempo de fatia de tempo: " CYAN "%-7d" RESET "|\n", cpu.quantum);
+    printf(BOLD "| Tempo de uso          : " RED "%-7d" RESET "|\n", cpu.used_time);
+    printf(BOLD "| Índice de início da memória: " MAGENTA "%-4d" RESET "|\n", cpu.index_mem_init);
+    printf(BOLD "| Índice de fim da memória: " MAGENTA "%-6d" RESET "|\n", cpu.index_mem_end);
+    printf(BOLD "====================================\n" RESET);
 
     if (cpu.actual_process != NULL) {
-        printf("| Processo atual        : %d       |\n", cpu.actual_process->simulated_process.process_id);
+        printf(GREEN "| Processo atual        : " YELLOW "%-7d" RESET "|\n", cpu.actual_process->simulated_process.process_id);
     } else {
-        printf("| Processo atual        : Não há processo na CPU |\n");
+        printf(RED "| Processo atual        : " RED "Não há processo na CPU" RESET " |\n");
     }
 
-    printf("Estado da memória:\n");
+    printf(BOLD "Estado da memória:\n" RESET);
     for (int i = cpu.index_mem_init; i < cpu.index_mem_end; i++) {
         if (i % 10 == 0) {
             printf("\n");
         }
 
-        printf("[%d]: %d ", i, cpu.memory->data[i]);
+        printf(i < 10 ? "[0%d]: %-3d " : "[%d]: %-3d ", i, cpu.memory->data[i]);
     }
 
-    printf("====================================\n");
+    printf("\n" BOLD "====================================\n\n" RESET);
 }
 
 int run_instruction(CPU *cpu, int mem_index, char instruction, int value) {

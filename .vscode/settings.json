@@ -10,6 +10,7 @@
         "stdlib.h": "c",
         "string.h": "c",
         "typeinfo": "c",
-        "cpu.h": "c"
+        "cpu.h": "c",
+        "colors.h": "c"
     }
 }

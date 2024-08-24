@@ -10,6 +10,9 @@ int main() {
         show_main_menu();
         scanf("%d", &type_input);
 
+        show_menu_escalonamento();
+        scanf("%d", &type_escalonamento);
+
         switch (type_input) {
             case 1:
                 read_terminal_input(string_input);
@@ -25,6 +28,6 @@ int main() {
         }
     } while (type_input != 1 && type_input != 2);
 
-    initialize_control_process(type_input, type_escalonamento, string_input);
+    initialize_control_process(type_input, type_escalonamento, string_input, type_escalonamento);
     return 1;
 }

@@ -84,6 +84,7 @@ void show_fila(TypeFila *fila) {
     while (aux != NULL) {
         printf("Dados do Item:\n");
         printf("Índice na fila: %d\n", aux->index);
+        printf("Índice na tabela de processos: %d\n", aux->item.process_table_index);
         printf("Prioridade: %d\n", *aux->item.priority);
         aux = aux->next_cell;
     }

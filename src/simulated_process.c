@@ -1,143 +1,135 @@
 #include "../libs/simulated_process.h"
 
-SimulatedProcess initialize_simulated_process(char *arq_name) {
+SimulatedProcess initialize_simulated_process(char *arq_name, int id) {
     SimulatedProcess process;
 
     int quant_int = 0, quant_rows = 0;
     quant_rows = set_process_instructions(arq_name, &process.process_instructions, &quant_int);
 
-    // Ao inicializar o processo simulado, o ponteiro para memória deve ser adicionado
-    process.memory = NULL;
+    process.process_id = id;
     process.instruction_quantity = quant_rows;
     process.int_quantity = quant_int;
     process.program_counter = 0;
     process.priority = 0;
 
+    process.time_blocked = 0;
+
+    show_simulated_process(process);
+    printf("Processo simulado inicializado com sucesso.\n");
     return process;
 }
 
 int set_process_instructions(char *arq_name, Instruction **instructions, int *quant_int) {
-    int quant_rows, cont;
+    int quant_rows, cont, value, index;
     FILE *arq;
-    char new_arq_name[MAX_TAM_ARQ_NAME];  // Nome do novo arquivo
-    char new_instruction_char;            // Caracter da nova instrução
-    int value, index;                     // Variáveis para armazenar valor e índice
+    char new_arq_name[100];
+    char temp_instruction_char;
+    char numbers[100];
 
-    // Conta o número de instruções no arquivo e aloca memória para as instruções
     quant_rows = count_arq_instructions(arq_name);
     *instructions = (Instruction *)malloc(quant_rows * sizeof(Instruction));
-    if (*instructions == NULL) {  // Verifica se a alocação foi bem-sucedida
-        fprintf(stderr, "Erro ao alocar memória para instruções.\n");
-        return -1;
-    }
 
-    // Abre o arquivo para leitura
     arq = fopen(arq_name, "rt");
-    if (arq == NULL) {
-        fprintf(stderr, "Erro ao abrir o arquivo %s\n", arq_name);
-        free(*instructions);  // Libera a memória alocada em caso de erro
-        return -1;            // Retorna erro se o arquivo não puder ser aberto
-    }
 
-    // Loop para ler cada instrução do arquivo
     for (cont = 0; cont < quant_rows; cont++) {
-        fscanf(arq, " %c", &new_instruction_char);  // Lê o caracter da instrução
-        (*instructions)[cont].instruction_char = new_instruction_char;
+        fscanf(arq, "%c", &temp_instruction_char);
 
-        // Processa a instrução com base no caracter lido
-        switch ((*instructions)[cont].instruction_char) {
-            case 'B':
+        (*instructions)[cont].instruction_char = temp_instruction_char;
+        char instruction_char = (*instructions)[cont].instruction_char;
+
+        switch (instruction_char) {
             case 'T':
-                // Não faz nada para 'B' e 'T'
                 break;
 
-            case 'N':                       // Se for 'N', lemos o índice
-            case 'D':                       // Se for 'D', lemos o índice
-            case 'F':                       // Se for 'F', lemos o índice
-                fscanf(arq, "%d", &index);  // Lê o índice
+            case 'N':
+            case 'D':
+            case 'F':
+            case 'B':
+                fscanf(arq, "%d", &index);
                 (*instructions)[cont].index = index;
 
-                // Se for a primeira instrução e for 'N', atribui ao quant_int
                 if (cont == 0 && (*instructions)[cont].instruction_char == 'N') {
                     *quant_int = index;
                 }
                 break;
 
-            case 'R':  // Se for 'R', lemos o nome do arquivo
+            case 'R':
                 fscanf(arq, "%s", new_arq_name);
                 strcpy((*instructions)[cont].arq_name, new_arq_name);
                 break;
 
-            case 'S':                                  // Se for 'S', lemos índice e valor
-            case 'A':                                  // Se for 'A', lemos índice e valor
-            case 'V':                                  // Se for 'V', lemos índice e valor
-                fscanf(arq, "%d %d", &index, &value);  // Lê índice e valor
+            case 'S':
+            case 'A':
+            case 'V':
+                fscanf(arq,
+                       "%d"
+                       "%d",
+                       &index, &value);
                 (*instructions)[cont].index = index;
                 (*instructions)[cont].value = value;
                 break;
 
             default:
-                // Se a instrução não for reconhecida, decrementa o contador
                 cont--;
                 break;
         }
     }
 
-    // Fecha o arquivo
     fclose(arq);
-    return quant_rows;  // Retorna o número de instruções lidas
+    return quant_rows;
 }
 
 int count_arq_instructions(char *arq_name) {
     FILE *arq;
-    int cont_rows = 0;
-    char character;
-
+    int quant_rows;
+    char instruction_char;
+    quant_rows = 0;
     arq = fopen(arq_name, "rt");
-    if (arq == NULL) {  // Verifica se o arquivo foi aberto corretamente
-        fprintf(stderr, "Erro ao abrir o arquivo %s\n", arq_name);
-        return -1;  // Retorna erro se o arquivo não puder ser aberto
-    }
-
-    while ((character = fgetc(arq)) != EOF) {
-        if (character == '\n') cont_rows++;  // Conta linhas
+    while ((instruction_char = fgetc(arq)) != EOF) {
+        if (instruction_char == '\n')
+            quant_rows++;
     }
     fclose(arq);
-    return cont_rows;
+    return quant_rows;
 }
 
+// Função para exibir o processo simulado
 void show_simulated_process(SimulatedProcess process) {
-    // Exibe informações do processo simulado
-    printf("Processo simulado:\n");
-    printf("Quantidade de instruções: %d\n", process.instruction_quantity);
-    printf("Quantidade de inteiros: %d\n", process.int_quantity);
-    printf("Program Counter: %d\n", process.program_counter);
-    printf("Prioridade: %d\n", process.priority);
+    printf(BOLD "Processo simulado:\n" RESET);
+    printf(BOLD "Quantidade de instruções: " RESET GREEN "%d\n" RESET, process.instruction_quantity);
+    printf(BOLD "Quantidade de inteiros: " RESET GREEN "%d\n" RESET, process.int_quantity);
+    printf(BOLD "Program Counter: " RESET YELLOW "%d\n" RESET, process.program_counter);
+    printf(BOLD "Prioridade: " RESET RED "%d\n" RESET, process.priority);
+    printf(BOLD "Tempo bloqueado (Instrução 'B'): " RESET CYAN "%d\n" RESET, process.time_blocked);
 
-    // Exibe cada instrução
-    for (int i = 0; i < process.instruction_quantity; i++) {
-        printf("Instrução %d: %c", i + 1, process.process_instructions[i].instruction_char);
+    // Exibe as instruções
+    show_instructions(process.process_instructions, process.instruction_quantity);
+}
 
-        // Se a instrução possui um índice, exibe-o
-        if (process.process_instructions[i].instruction_char == 'N' ||
-            process.process_instructions[i].instruction_char == 'D' ||
-            process.process_instructions[i].instruction_char == 'F' ||
-            process.process_instructions[i].instruction_char == 'S' ||
-            process.process_instructions[i].instruction_char == 'A' ||
-            process.process_instructions[i].instruction_char == 'V') {
-            printf(", Índice: %d", process.process_instructions[i].index);
+// Função para exibir as instruções
+void show_instructions(Instruction *instructions, int quant_rows) {
+    printf(BOLD "Instruções:\n" RESET);
+    for (int i = 0; i < quant_rows; i++) {
+        printf(CYAN "Instrução %d: %c" RESET, i + 1, instructions[i].instruction_char);
+
+        if (instructions[i].instruction_char == 'N' ||
+            instructions[i].instruction_char == 'D' ||
+            instructions[i].instruction_char == 'F' ||
+            instructions[i].instruction_char == 'S' ||
+            instructions[i].instruction_char == 'A' ||
+            instructions[i].instruction_char == 'B' ||
+            instructions[i].instruction_char == 'V') {
+            printf(YELLOW ", Índice: %d" RESET, instructions[i].index);
         }
 
-        // Se a instrução é 'R', exibe o nome do arquivo
-        if (process.process_instructions[i].instruction_char == 'R') {
-            printf(", Arquivo: %s", process.process_instructions[i].arq_name);
+        if (instructions[i].instruction_char == 'R') {
+            printf(MAGENTA ", Arquivo: %s" RESET, instructions[i].arq_name);
         }
 
-        // Se a instrução possui um valor, exibe-o
-        if (process.process_instructions[i].instruction_char == 'S' ||
-            process.process_instructions[i].instruction_char == 'A' ||
-            process.process_instructions[i].instruction_char == 'V') {
-            printf(", Valor: %d", process.process_instructions[i].value);
+        if (instructions[i].instruction_char == 'S' ||
+            instructions[i].instruction_char == 'A' ||
+            instructions[i].instruction_char == 'V') {
+            printf(GREEN ", Valor: %d" RESET, instructions[i].value);
         }
         printf("\n");
     }

@@ -3,7 +3,7 @@
 
 #include "simulated_process.h"
 
-#include <sys/types.h>
+#include <sys/types.h> // Para pid_t
 #include <unistd.h> // Para getpid, pipe, fork, close, write, read
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,6 +37,7 @@ int is_empty(ProcessTable *process_table);
 int add_process_to_table(ItemProcess new_item_process, ProcessTable *process_table);
 void remove_process_from_table(int indexToRemove, ProcessTable *process_table);
 void show_process_table(ProcessTable process_table);
+void show_item_process(ItemProcess process);
 int get_first_empty_position(ProcessTable *process_table);
 
 void create_new_item_process(pid_t parent_id, int program_counter, SimulatedProcess simulated_process, int priority, ProcessTable *process_table);
