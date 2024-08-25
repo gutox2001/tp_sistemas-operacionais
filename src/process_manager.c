@@ -103,10 +103,10 @@ void run_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process
     int index_free_cpu;
 
     printf("Lista de comandos: %s\n", input_command_string);
-
+    int cont = 0;
     char current_command = input_command_string[0];
     do {
-        char current_command = input_command_string[*command_index];
+        current_command = input_command_string[*command_index];
         printf("\nComando atual a ser executado: %c\nIndice do comando: %d\n", current_command, *command_index);
 
         // Verifica se há processos bloqueados e se o tempo de bloqueio acabou
@@ -244,7 +244,7 @@ void run_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process
         //         break;
         // }
         *command_index = *command_index + 1;
-    } while (current_command != "M");
+    } while (current_command != 'M');
 }
 
 int is_any_cpu_available(ProcessManager *process_manager) {
