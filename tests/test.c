@@ -68,7 +68,7 @@ SimulatedProcess test_simulated_process() {
     printf("Iniciando os testes do processo simulado...\n");
 
     // Criação do processo simulado
-    SimulatedProcess temp_simulated_process = initialize_simulated_process("data/init.txt");
+    SimulatedProcess temp_simulated_process = initialize_simulated_process("data/init.txt", 0);
     // if (temp_simulated_process.process_instructions == NULL) {
     //     printf("Erro ao obter processo simulado do arquivo...\n");
     //     return NULL;

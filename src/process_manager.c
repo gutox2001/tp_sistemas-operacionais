@@ -1,5 +1,7 @@
 #include "../libs/process_manager.h"
 
+#include <ctype.h>
+
 void initialize_process_manager(ProcessManager *process_manager, CPU *cpu_list) {
     process_manager->cpu_list = cpu_list;
     initialize_empty_fila(&process_manager->ReadyState);
@@ -105,14 +107,21 @@ void run_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process
     printf("Lista de comandos: %s\n", input_command_string);
 
     char current_command = input_command_string[0];
+
+    // if (sizeof(current_command) == 1 && isalpha(current_command)) {
+    //     printf("A variável é do tipo char.\n");
+    // } else {
+    //     printf("A variável não é do tipo char.\n");
+    // }
+
     do {
         char current_command = input_command_string[*command_index];
         printf("\nComando atual a ser executado: %c\nIndice do comando: %d\n", current_command, *command_index);
 
         // Verifica se há processos bloqueados e se o tempo de bloqueio acabou
-        verify_process_block_time(process_manager);
+        // verify_process_block_time(process_manager);
 
-        verify_all_filas(process_manager, running);
+        // verify_all_filas(process_manager, running);
 
         // switch (current_command) {
         //     case 'U': {
@@ -244,7 +253,8 @@ void run_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process
         //         break;
         // }
         *command_index = *command_index + 1;
-    } while (current_command != "M");
+        // strcmp(&current_command, "M") != 1
+    } while (current_command != 'M');  
 }
 
 int is_any_cpu_available(ProcessManager *process_manager) {
