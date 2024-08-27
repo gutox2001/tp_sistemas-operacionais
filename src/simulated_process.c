@@ -36,6 +36,9 @@ int set_process_instructions(char *arq_name, Instruction **instructions, int *qu
 
         (*instructions)[cont].instruction_char = temp_instruction_char;
         char instruction_char = (*instructions)[cont].instruction_char;
+        if (instruction_char != ' ') {
+            printf("Instrução a ser executada no processo simulado: %c\n", instruction_char);
+        }
 
         switch (instruction_char) {
             case 'T':

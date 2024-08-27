@@ -68,7 +68,7 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
         create_new_item_process(pid, 0, control_process, 0, &process_manager.process_table);
 
         // Instancia o primeiro processe simulado
-        first_simulated_process = initialize_simulated_process("data/first_process.txt", 1);
+        first_simulated_process = initialize_simulated_process("data/arquivo.txt", 1);
         // Percorre a string de entrada passando os comandos para o gerenciador de processos
         create_new_item_process(0, 0, first_simulated_process, 0, &process_manager.process_table);
         TypeItem new_item = {1, &process_manager.process_table.item_process[1].priority};
