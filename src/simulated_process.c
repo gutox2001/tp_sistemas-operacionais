@@ -45,8 +45,11 @@ int set_process_instructions(char *arq_name, Instruction **instructions, int *qu
                 break;
 
             case 'N':
+                break;
             case 'D':
+                break;
             case 'F':
+                break;
             case 'B':
                 fscanf(arq, "%d", &index);
                 (*instructions)[cont].index = index;
@@ -62,7 +65,10 @@ int set_process_instructions(char *arq_name, Instruction **instructions, int *qu
                 break;
 
             case 'S':
+                break;
             case 'A':
+                break;
+                
             case 'V':
                 fscanf(arq,
                        "%d"
