@@ -122,7 +122,7 @@ void read_terminal_input(char *return_char) {
     printf("O comando 'M' deve ser o último e aparece exatamente uma vez.\n");
 
     do {
-        scanf("%c", &input);
+        scanf(" %c", &input);
         if (input >= 97 && input <= 120) {
             input = input - 32;
         }
