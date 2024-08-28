@@ -81,6 +81,25 @@ void escalona_by_priority(ProcessManager *process_manager, CPU *cpu, char *recei
 
 void escalona_fcfs(ProcessManager *process_manager, CPU *cpu, char *receive_string, int *is_system_running, int *command_index) {
     // TODO: implementar Escalonamento FCFS
+    // Não precisa ordenar a fila de processos prontos, pois o escalonamento é FCFS
+
+    // Se houver um processo pronto para executar
+    if (!is_fila_empty(process_manager->ReadyState)) {
+        pid_t next_process_index = process_manager->ReadyState.start->item.process_table_index;
+
+        // Realiza a troca de contexto, passando o novo processo para a CPU
+        troca_de_contexto(process_manager, cpu, Pronto, receive_string, 1, command_index, is_system_running);
+        return;
+    } else {
+        printf("Nenhum processo pronto para executar.\n");
+        // Caso não haja processos prontos, verifica se há processos bloqueados
+        if (is_fila_empty(process_manager->BlockedState)) {
+            printf("Nenhum processo pronto ou bloqueado para executar.\n");
+            *is_system_running = 0;
+            return;
+        }
+        return;
+    }
 }
 
 void run_selected_escalonador(ProcessManager *process_manager, CPU *cpu, char *receive_string, int selected_escalonador, int *is_system_running, int *command_index) {
