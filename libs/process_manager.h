@@ -24,15 +24,18 @@ typedef struct ProcessManager {
 
 void initialize_process_manager(ProcessManager *process_manager, CPU *cpu_list);
 
-void troca_de_contexto(ProcessManager *process_manager, CPU *cpu, State old_process_new_state, char *receive_string, int selected_escalonador, int *command_index, int *is_system_running);
+void troca_de_contexto(ProcessManager *process_manager, CPU *cpu, State old_process_new_state, char *receive_string, int selected_escalonador, int *command_index);
 
-void escalona_by_priority(ProcessManager *process_manager, CPU *cpu, char *receive_string, int *is_system_running, int *command_index);
+void escalona_by_priority(ProcessManager *process_manager, CPU *cpu, char *receive_string, int *command_index);
 
-void escalona_fcfs(ProcessManager *process_manager, CPU *cpu, char *receive_string, int *is_system_running, int *command_index);
+void escalona_fcfs(ProcessManager *process_manager, CPU *cpu, char *receive_string, int *command_index);
 
-void run_selected_escalonador(ProcessManager *process_manager, CPU *cpu, char *receive_string, int selected_escalonador, int *is_system_running, int *command_index);
+void run_selected_escalonador(ProcessManager *process_manager, CPU *cpu, char *receive_string, int selected_escalonador, int *command_index);
 
-void run_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process, char *input_command_string, int selected_escalonador, int *running, int *command_index);
+//Os processos são executados de acordo a lista de processos em execução.
+void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process, char current_command, int selected_escalonador, char *input_command_string, int *command_index);
+
+void run_commands(ProcessManager *process_manager, char *input_command_string, int selected_escalonador, int *command_index);
 
 void sort_fila_by_priority(TypeFila *fila);
 
@@ -45,6 +48,10 @@ int get_time_slice_by_priority(int priority);
 
 void verify_process_block_time(ProcessManager *process_manager);
 
-void verify_all_filas(ProcessManager *process_manager, int *is_running);
+void verify_all_filas(ProcessManager *process_manager);
+
+CPU* get_cpu_by_process_id(ProcessManager *process_manager, int process_id);
+
+void show_process_manager(ProcessManager *process_manager);
 
 #endif

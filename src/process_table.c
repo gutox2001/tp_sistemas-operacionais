@@ -32,6 +32,8 @@ void create_new_item_process(pid_t parent_id, int program_counter, SimulatedProc
 
     add_process_to_table(new_item, process_table);
     printf("Processo criado e adicionado com sucesso a tabela. ID: %d\n", new_item.id);
+    printf("\nTabela de processos atualizada:\n");
+    show_process_table(*process_table);
 }
 
 // Função para verificar se a tabela de processos está vazia
