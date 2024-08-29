@@ -114,135 +114,135 @@ void run_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process
 
         verify_all_filas(process_manager, running);
 
-        // switch (current_command) {
-        //     case 'U': {
-        //         // Executar a próxima instrução do processo
-        //         Instruction current_instruction = process->simulated_process.process_instructions[process->program_counter];
-        //         printf("\nInstrução atual: %c; Indice: %d\n", current_instruction.instruction_char, current_instruction.index);
+        switch (current_command) {
+            case 'U': {
+                // Executar a próxima instrução do processo
+                Instruction current_instruction = process->simulated_process.process_instructions[process->program_counter];
+                printf("\nInstrução atual: %c; Indice: %d\n", current_instruction.instruction_char, current_instruction.index);
 
-        //         switch (current_instruction.instruction_char) {
-        //             case 'N':
-        //                 printf("Executando a instrução N: %d\n", current_instruction.index);
-        //                 process->simulated_process.int_quantity = current_instruction.index;
-        //                 process->simulated_process.program_counter++;
-        //                 cpu->program_counter++;
-        //                 cpu->used_time++;
-        //                 cpu->quantum++;
-        //                 break;
+                switch (current_instruction.instruction_char) {
+                    case 'N':
+                        printf("Executando a instrução N: %d\n", current_instruction.index);
+                        process->simulated_process.int_quantity = current_instruction.index;
+                        process->simulated_process.program_counter++;
+                        cpu->program_counter++;
+                        cpu->used_time++;
+                        cpu->quantum++;
+                        break;
 
-        //             case 'D':
-        //                 printf("Executando a instrução D: %d\n", current_instruction.index);
-        //                 run_instruction(cpu, current_instruction.index, current_instruction.instruction_char, 0);
-        //                 break;
+                    case 'D':
+                        printf("Executando a instrução D: %d\n", current_instruction.index);
+                        run_instruction(cpu, current_instruction.index, current_instruction.instruction_char, 0);
+                        break;
 
-        //             case 'A':
-        //             case 'S':
-        //             case 'V':
-        //                 printf("Executando a instrução %c: %d\n", current_instruction.instruction_char, current_instruction.index);
-        //                 run_instruction(cpu, current_instruction.index, current_instruction.instruction_char, current_instruction.value);
-        //                 break;
+                    case 'A':
+                    case 'S':
+                    case 'V':
+                        printf("Executando a instrução %c: %d\n", current_instruction.instruction_char, current_instruction.index);
+                        run_instruction(cpu, current_instruction.index, current_instruction.instruction_char, current_instruction.value);
+                        break;
 
-        //             case 'B':
-        //                 // Mover o processo atual para o estado bloqueado e trocar contexto
-        //                 process->process_state = Bloqueado;
-        //                 troca_de_contexto(process_manager, cpu, Bloqueado, input_command_string, selected_escalonador, command_index, running);
-        //                 break;
+                    case 'B':
+                        // Mover o processo atual para o estado bloqueado e trocar contexto
+                        process->process_state = Bloqueado;
+                        troca_de_contexto(process_manager, cpu, Bloqueado, input_command_string, selected_escalonador, command_index, running);
+                        break;
 
-        //             case 'T':
-        //                 // Finalizar o processo
+                    case 'T':
+                        // Finalizar o processo
 
-        //                 remove_process_from_table(process->id, &process_manager->process_table);
-        //                 clean_cpu(cpu);
-        //                 // Troca para o próximo processo pronto
-        //                 escalona_by_priority(process_manager, cpu, input_command_string, running, command_index);
-        //                 return;
+                        remove_process_from_table(process->id, &process_manager->process_table);
+                        clean_cpu(cpu);
+                        // Troca para o próximo processo pronto
+                        escalona_by_priority(process_manager, cpu, input_command_string, running, command_index);
+                        return;
 
-        //             case 'F':
-        //                 // Criar um novo processo baseado no pai
-        //                 create_new_item_process(process->id, process->program_counter + 1, process->simulated_process, process->priority, &process_manager->process_table);
+                    case 'F':
+                        // Criar um novo processo baseado no pai
+                        create_new_item_process(process->id, process->program_counter + 1, process->simulated_process, process->priority, &process_manager->process_table);
 
-        //                 // Adicionar o novo processo na fila de prontos
-        //                 TypeItem new_item = {process_manager->process_table.last_item, &process_manager->process_table.item_process[process_manager->process_table.last_item].priority};
-        //                 add_item_to_fila(new_item, &process_manager->ReadyState);
+                        // Adicionar o novo processo na fila de prontos
+                        TypeItem new_item = {process_manager->process_table.last_item, &process_manager->process_table.item_process[process_manager->process_table.last_item].priority};
+                        add_item_to_fila(new_item, &process_manager->ReadyState);
 
-        //                 // Ajustar prioridade do pai, reduzindo-a
-        //                 process->priority = process->priority + 1;
+                        // Ajustar prioridade do pai, reduzindo-a
+                        process->priority = process->priority + 1;
 
-        //                 // Verifica se há CPU disponível
-        //                 index_free_cpu = is_any_cpu_available(process_manager);
-        //                 if (index_free_cpu != -1) {
-        //                     run_selected_escalonador(process_manager, &process_manager->cpu_list[index_free_cpu], input_command_string, selected_escalonador, running, command_index);
-        //                 } else {
-        //                     run_selected_escalonador(process_manager, cpu, input_command_string, selected_escalonador, running, command_index);
-        //                 }
-        //                 break;
+                        // Verifica se há CPU disponível
+                        index_free_cpu = is_any_cpu_available(process_manager);
+                        if (index_free_cpu != -1) {
+                            run_selected_escalonador(process_manager, &process_manager->cpu_list[index_free_cpu], input_command_string, selected_escalonador, running, command_index);
+                        } else {
+                            run_selected_escalonador(process_manager, cpu, input_command_string, selected_escalonador, running, command_index);
+                        }
+                        break;
 
-        //             case 'R':
-        //                 // Substitui a imagem do processo atual
-        //                 SimulatedProcess temp_simulated_process = initialize_simulated_process(current_instruction.arq_name, process->id);
-        //                 process->simulated_process = temp_simulated_process;
-        //                 process->program_counter = 0;
+                    case 'R':
+                        // Substitui a imagem do processo atual
+                        SimulatedProcess temp_simulated_process = initialize_simulated_process(current_instruction.arq_name, process->id);
+                        process->simulated_process = temp_simulated_process;
+                        process->program_counter = 0;
 
-        //                 // Verifica se há CPU disponível
-        //                 index_free_cpu = is_any_cpu_available(process_manager);
-        //                 if (index_free_cpu != -1) {
-        //                     run_selected_escalonador(process_manager, &process_manager->cpu_list[index_free_cpu], input_command_string, selected_escalonador, running, command_index);
-        //                 } else {
-        //                     run_selected_escalonador(process_manager, cpu, input_command_string, selected_escalonador, running, command_index);
-        //                 }
-        //                 break;
+                        // Verifica se há CPU disponível
+                        index_free_cpu = is_any_cpu_available(process_manager);
+                        if (index_free_cpu != -1) {
+                            run_selected_escalonador(process_manager, &process_manager->cpu_list[index_free_cpu], input_command_string, selected_escalonador, running, command_index);
+                        } else {
+                            run_selected_escalonador(process_manager, cpu, input_command_string, selected_escalonador, running, command_index);
+                        }
+                        break;
 
-        //             default:
-        //                 printf("Instrução desconhecida: %c\n", current_instruction.instruction_char);
-        //                 break;
-        //         }
-        //         process->program_counter++;
-        //         break;
-        //     }
+                    default:
+                        printf("Instrução desconhecida: %c\n", current_instruction.instruction_char);
+                        break;
+                }
+                process->program_counter++;
+                break;
+            }
 
-        //     case 'I':
-        //         // Mostrar o estado atual do sistema
-        //         printf(BOLD "GERENCIADOR DE PROCESSOS: \n" RESET);
-        //         show_process_table(process_manager->process_table);
+            case 'I':
+                // Mostrar o estado atual do sistema
+                printf(BOLD "GERENCIADOR DE PROCESSOS: \n" RESET);
+                show_process_table(process_manager->process_table);
 
-        //         for (int j = 0; j < QUANT_CPU; j++) {
-        //             printf("-> -> __ CPU %d: __ <- <-\n", j);
-        //             show_cpu(process_manager->cpu_list[j]);
-        //         }
-        //         printf("-> -> __ Processos bloqueados: __ <- <-\n");
-        //         show_fila(&process_manager->BlockedState);
+                for (int j = 0; j < QUANT_CPU; j++) {
+                    printf("-> -> __ CPU %d: __ <- <-\n", j);
+                    show_cpu(process_manager->cpu_list[j]);
+                }
+                printf("-> -> __ Processos bloqueados: __ <- <-\n");
+                show_fila(&process_manager->BlockedState);
 
-        //         printf("-> -> __ Processos prontos: __ <- <-\n");
-        //         show_fila(&process_manager->ReadyState);
-        //         printf("-> -> __ Processos em execução: __ <- <-\n");
-        //         show_fila(&process_manager->ExecutionState);
-        //         break;
+                printf("-> -> __ Processos prontos: __ <- <-\n");
+                show_fila(&process_manager->ReadyState);
+                printf("-> -> __ Processos em execução: __ <- <-\n");
+                show_fila(&process_manager->ExecutionState);
+                break;
 
-        //     case 'M':
-        //         // Mostrar o estado do sistema e encerrar
-        //         printf(BOLD "GERENCIADOR DE PROCESSOS: \n" RESET);
-        //         show_process_table(process_manager->process_table);
-        //         for (int j = 0; j < QUANT_CPU; j++) {
-        //             printf("-> -> __ CPU %d: __ <- <-\n", j);
-        //             show_cpu(process_manager->cpu_list[j]);
-        //         }
+            case 'M':
+                // Mostrar o estado do sistema e encerrar
+                printf(BOLD "GERENCIADOR DE PROCESSOS: \n" RESET);
+                show_process_table(process_manager->process_table);
+                for (int j = 0; j < QUANT_CPU; j++) {
+                    printf("-> -> __ CPU %d: __ <- <-\n", j);
+                    show_cpu(process_manager->cpu_list[j]);
+                }
 
-        //         printf("-> -> __ Processos bloqueados: __ <- <-\n");
-        //         show_fila(&process_manager->BlockedState);
+                printf("-> -> __ Processos bloqueados: __ <- <-\n");
+                show_fila(&process_manager->BlockedState);
 
-        //         printf("-> -> __ Processos prontos: __ <- <-\n");
-        //         show_fila(&process_manager->ReadyState);
-        //         printf("-> -> __ Processos em execução: __ <- <-\n");
-        //         show_fila(&process_manager->ExecutionState);
+                printf("-> -> __ Processos prontos: __ <- <-\n");
+                show_fila(&process_manager->ReadyState);
+                printf("-> -> __ Processos em execução: __ <- <-\n");
+                show_fila(&process_manager->ExecutionState);
 
-        //         printf("Encerrando o sistema.\n");
-        //         *running = 0;
-        //         break;
+                printf("Encerrando o sistema.\n");
+                *running = 0;
+                break;
 
-        //     default:
-        //         printf("Comando desconhecido: %c\n", current_command);
-        //         break;
-        // }
+            default:
+                printf("Comando desconhecido: %c\n", current_command);
+                break;
+        }
         *command_index = *command_index + 1;
     } while (current_command != 'M');
 }
