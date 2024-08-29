@@ -1,7 +1,7 @@
 #ifndef CPU_H
 #define CPU_H
 
-#define QUANT_CPU 1
+#define QUANT_CPU 2
 
 #include "memory.h"
 #include "process_table.h"

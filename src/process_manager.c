@@ -97,14 +97,13 @@ void escalona_fcfs(ProcessManager *process_manager, CPU *cpu, char *receive_stri
         pid_t next_process_index = process_manager->ReadyState.start->item.process_table_index;
 
         // Realiza a troca de contexto, passando o novo processo para a CPU
-        troca_de_contexto(process_manager, cpu, Pronto, receive_string, 1, command_index, is_system_running);
+        troca_de_contexto(process_manager, cpu, Pronto, receive_string, 1, command_index);
         return;
     } else {
         printf("Nenhum processo pronto para executar.\n");
         // Caso não haja processos prontos, verifica se há processos bloqueados
         if (is_fila_empty(process_manager->BlockedState)) {
             printf("Nenhum processo pronto ou bloqueado para executar.\n");
-            *is_system_running = 0;
             return;
         }
         return;
