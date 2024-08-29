@@ -36,9 +36,9 @@ int set_process_instructions(char *arq_name, Instruction **instructions, int *qu
 
         (*instructions)[cont].instruction_char = temp_instruction_char;
         char instruction_char = (*instructions)[cont].instruction_char;
-        if (instruction_char != ' ') {
-            printf("Instrução a ser executada no processo simulado: %c\n", instruction_char);
-        }
+        // if (instruction_char != ' ') {
+        //     printf("Instrução a ser executada no processo simulado: %c\n", instruction_char);
+        // }
 
         switch (instruction_char) {
             case 'T':
@@ -99,6 +99,7 @@ int count_arq_instructions(char *arq_name) {
 // Função para exibir o processo simulado
 void show_simulated_process(SimulatedProcess process) {
     printf(BOLD "Processo simulado:\n" RESET);
+    printf(BOLD "ID do processo: " RESET YELLOW "%d\n" RESET, process.process_id);
     printf(BOLD "Quantidade de instruções: " RESET GREEN "%d\n" RESET, process.instruction_quantity);
     printf(BOLD "Quantidade de inteiros: " RESET GREEN "%d\n" RESET, process.int_quantity);
     printf(BOLD "Program Counter: " RESET YELLOW "%d\n" RESET, process.program_counter);

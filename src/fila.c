@@ -1,53 +1,42 @@
 #include "../libs/fila.h"
 
 void initialize_empty_fila(TypeFila *fila) {
-    fila->start = (Cell *)malloc(sizeof(Cell));
-    if (fila->start == NULL) {
-        fprintf(stderr, "Erro ao alocar memória para a fila.\n");
-        exit(EXIT_FAILURE);
-    }
-    fila->end = fila->start;
-    fila->start->next_cell = NULL;
+    // fila->start = (Cell *)malloc(sizeof(Cell));
+    // if (fila->start == NULL) {
+    //     fprintf(stderr, "Erro ao alocar memória para a fila.\n");
+    //     exit(EXIT_FAILURE);
+    // }
+    fila->start = NULL;
+    fila->end = NULL;
 }
 
 int is_fila_empty(TypeFila fila) {
-    return (fila.start == fila.end);
+    return (fila.start == NULL && fila.end == NULL);
 }
 
 void add_item_to_fila(TypeItem new_item, TypeFila *fila) {
-    Cell *new_cell, *temp_current_cell, *temp_next_cell;
-    
-    new_cell = (Cell *)malloc(sizeof(Cell));
+    Cell *new_cell = (Cell *)malloc(sizeof(Cell));
+
     if (new_cell == NULL) {
         fprintf(stderr, "Erro ao alocar memória para nova célula.\n");
         exit(EXIT_FAILURE);
     }
 
-    if (is_fila_empty(*fila)) {
-        new_cell->index = 0;
-    } else {
-        new_cell->index = fila->end->index + 1;
-    }
-    
     new_cell->item = new_item;
     new_cell->next_cell = NULL;
 
-    temp_current_cell = fila->start;
-    temp_next_cell = fila->start->next_cell; // Corrigido para iniciar do primeiro item válido
-
-    while (temp_next_cell != NULL && temp_next_cell->item.priority < new_item.priority) {
-        temp_current_cell = temp_next_cell;
-        temp_next_cell = temp_next_cell->next_cell;
+    if (is_fila_empty(*fila)) {
+        // Fila vazia, nova célula será o primeiro e o último elemento
+        new_cell->index = 0;
+        fila->start = fila->end = new_cell;
+        printf("Fila está vazia, item será adicionado na primeira posição. Índice na fila: %d\n", new_cell->index);
+    } else {
+        // Inserção no final da fila
+        new_cell->index = fila->end->index + 1;
+        fila->end->next_cell = new_cell;
+        fila->end = new_cell;
+        printf("Item adicionado ao final da fila. Índice na fila: %d\n", new_cell->index);
     }
-
-    new_cell->next_cell = temp_next_cell;
-    temp_current_cell->next_cell = new_cell;
-
-    if(temp_next_cell == NULL) {
-        fila->end = new_cell; // Corrigido para apontar para a nova célula adicionada
-    }
-
-    printf("Item adicionado na fila com sucesso! Índice na fila: %d\n", fila->end->index);
 }
 
 int remove_item_from_fila(TypeFila *fila) {
@@ -56,30 +45,28 @@ int remove_item_from_fila(TypeFila *fila) {
         return -1;
     }
 
-    Cell *aux = fila->start->next_cell;
-    if (aux == NULL) {
-        return -1;
-    }
+    Cell *aux = fila->start;
+    fila->start = fila->start->next_cell;
 
-    fila->start->next_cell = aux->next_cell;
     int index = aux->item.process_table_index;
     free(aux);
 
-    if (fila->start->next_cell == NULL) {
-        fila->end = fila->start;
+    if (fila->start == NULL) {  // Se a fila ficou vazia após a remoção
+        fila->end = NULL;
     }
 
     return index;
 }
 
-void show_fila(TypeFila *fila) {
-    printf("Imprimindo fila...\n");
-    Cell *aux = fila->start->next_cell; // Corrigido para começar a partir do primeiro item válido
 
+void show_fila(TypeFila *fila) {
     if (is_fila_empty(*fila)) {
         printf("Essa fila está vazia!\n");
         return;
     }
+
+    Cell *aux = fila->start;
+    printf("\nImprimindo fila...");
 
     while (aux != NULL) {
         printf("Dados do Item:\n");
@@ -91,21 +78,33 @@ void show_fila(TypeFila *fila) {
 }
 
 void sort_fila_by_priority(TypeFila *fila) {
+    if (is_fila_empty(*fila)) {
+        printf("A fila está vazia, não é necessário ordenar.\n");
+        return;
+    }
+
     Cell *current_cell, *next_cell;
     TypeItem temp_item;
-    int temp_index;
+    int swapped;
 
-    for (current_cell = fila->start->next_cell; current_cell != NULL; current_cell = current_cell->next_cell) {
-        for (next_cell = current_cell->next_cell; next_cell != NULL; next_cell = next_cell->next_cell) {
-            if (*current_cell->item.priority > *next_cell->item.priority) {
+    // Loop externo que continua enquanto ocorrem trocas
+    do {
+        swapped = 0;
+        current_cell = fila->start;
+
+        // Loop interno para comparar elementos adjacentes
+        while (current_cell->next_cell != NULL) {
+            next_cell = current_cell->next_cell;
+
+            // Comparação de prioridades
+            if (*(current_cell->item.priority) > *(next_cell->item.priority)) {
+                // Troca de itens
                 temp_item = current_cell->item;
                 current_cell->item = next_cell->item;
                 next_cell->item = temp_item;
-
-                temp_index = current_cell->index;
-                current_cell->index = next_cell->index;
-                next_cell->index = temp_index;
+                swapped = 1;
             }
+            current_cell = next_cell;
         }
-    }
+    } while (swapped);
 }

@@ -17,7 +17,7 @@ void add_process_to_cpu(CPU *cpu, ItemProcess *process) {
     cpu->program_counter = process->simulated_process.program_counter;
 
     printf("Processo de ID %d adicionado da CPU.\n", cpu->actual_process->simulated_process.process_id);
-    show_cpu(*cpu);
+    //show_cpu(*cpu);
     return;
 }
 
@@ -30,31 +30,31 @@ int is_cpu_empty(CPU *cpu) {
 }
 
 void clean_cpu(CPU *cpu) {
-    int temp_id = 0;
+    if (cpu->actual_process != NULL) {
+        int temp_id = cpu->actual_process->simulated_process.process_id;
 
-    // Limpando a memória usada
-    for (size_t i = 0; i < cpu->quant_int; i++) {
-        int memory_index = (cpu->actual_process->simulated_process.process_instructions[i].index + cpu->index_mem_init);
-        // É adicionado o valor 0 da memória da CPU para que os índices sejam corrigidos para limpar os dados
+        // Limpando a memória usada pelo processo atual
+        for (size_t i = 0; i < cpu->quant_int; i++) {
+            int memory_index = cpu->index_mem_init + i;
+            cpu->memory->data[memory_index] = -1;  // Marca o espaço como "limpo" ou "vazio"
+        }
 
-        cpu->memory->data[i] = -1;
+        // Limpando os campos da CPU
+        cpu->actual_process = NULL;
+        cpu->program_counter = 0;
+        cpu->quant_int = 0;
+        cpu->quantum = 0;
+
+        printf("\nProcesso de ID %d retirado da CPU.\nTempo de CPU usado até o momento: %d unidades de tempo.\n", temp_id, cpu->used_time);
+        printf("\n***************************************\n");
+    } else {
+        printf("Nenhum processo para limpar na CPU.\n");
     }
-
-    temp_id = cpu->actual_process->simulated_process.process_id;
-
-    // Limpando os campos da CPU
-    cpu->actual_process = NULL;
-    cpu->program_counter = 0;
-    cpu->quant_int = 0;
-    cpu->quantum = 0;
-
-    printf("\nProcesso de ID %d retirado da CPU.\nTempo de CPU usado até o momento: %d und de tempo.\n", temp_id, cpu->used_time);
-    printf("***************************************\n");
 }
 
 // Função para exibir o estado da CPU
 void show_cpu(CPU cpu) {
-    printf(BOLD "\n====================================\n" RESET);
+    printf(BOLD "\n\n====================================\n" RESET);
     printf(BOLD "|               CPU                |\n" RESET);
     printf(BOLD "====================================\n" RESET);
     printf(BOLD "| Program Counter       : " YELLOW "%-7d" RESET "|\n", cpu.program_counter);
@@ -84,6 +84,8 @@ void show_cpu(CPU cpu) {
 }
 
 int run_instruction(CPU *cpu, int mem_index, char instruction, int value) {
+    mem_index += cpu->index_mem_init;
+    
     switch (instruction) {
         case 'A':
             cpu->memory->data[mem_index] += value;

@@ -11,6 +11,7 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
     ProcessManager process_manager;  // Gerenciador de processos do sistema
     SimulatedProcess control_process;
     SimulatedProcess first_simulated_process;  // Primeiro processo simulado que será executado
+    SimulatedProcess second_simulated_process;  // Segundo processo simulado que será executado - TESTE múltipla CPU
     ItemProcess new_item_process;              // Item processo da tabela de processos
 
     // Inicializa a memória do sistema
@@ -53,6 +54,7 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
         char receive_string[TAM_MAX_MNS] = "";
         int is_system_running = 1;  // Flag para verificar se o sistema está em execução
         int command_index = 0;      // Índice do comando atual
+        TypeItem new_item;
 
         close(fd[1]);
         read(fd[0], receive_string, sizeof(receive_string));
@@ -66,17 +68,31 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
         // Inicializa o gerenciador de processos
         initialize_process_manager(&process_manager, CPU_list);
         create_new_item_process(pid, 0, control_process, 0, &process_manager.process_table);
+        process_manager.process_table.item_process[0].process_state = Execucao;
 
         // Instancia o primeiro processe simulado
         first_simulated_process = initialize_simulated_process("data/first_process.txt", 1);
         // Percorre a string de entrada passando os comandos para o gerenciador de processos
         create_new_item_process(0, 0, first_simulated_process, 0, &process_manager.process_table);
-        TypeItem new_item = {1, &process_manager.process_table.item_process[1].priority};
+        new_item.process_table_index = 1;
+        new_item.priority = &process_manager.process_table.item_process[1].priority;
 
         // Colocar o processo na CPU e o adiciona na fila de execução. Depois o executa
-        add_process_to_cpu(&CPU_list[0], &process_manager.process_table.item_process[1]);
         add_item_to_fila(new_item, &process_manager.ExecutionState);
-        run_process(&process_manager, &CPU_list[0], &process_manager.process_table.item_process[1], receive_string, selected_escalonador, &is_system_running, &command_index);
+        process_manager.process_table.item_process[1].process_state = Execucao;
+
+        // Instancia o segundo processe simulado TESTE!
+        second_simulated_process = initialize_simulated_process("data/first_process.txt", 2);
+        // Percorre a string de entrada passando os comandos para o gerenciador de processos
+        create_new_item_process(1, 0, second_simulated_process, 0, &process_manager.process_table);
+        new_item.process_table_index = 2;
+        new_item.priority = &process_manager.process_table.item_process[2].priority;
+
+        // Colocar o processo na CPU e o adiciona na fila de execução. Depois o executa
+        add_item_to_fila(new_item, &process_manager.ExecutionState);
+        process_manager.process_table.item_process[2].process_state = Execucao;
+        
+        run_commands(&process_manager, receive_string, selected_escalonador, &command_index);
         // return;
     }
 
@@ -170,7 +186,7 @@ void show_control_process(double execution_time, int selected_escalonador) {
     printf("====================================\n");
     printf("|          Processo de Controle    |\n");
     printf("====================================\n");
-    printf("| Tempo de execução da aplicação: %.2f segundos |\n", execution_time);
+    printf("| Tempo de execução da aplicação: %.10f segundos |\n", execution_time);
     printf("====================================\n");
     printf("| Escalonador escolhido: %d\n", selected_escalonador);
     printf("====================================\n");
