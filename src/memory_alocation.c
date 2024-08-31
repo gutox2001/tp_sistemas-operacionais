@@ -1,6 +1,6 @@
 #include "../libs/memory_alocation.h"
 #include "../libs/memory.h"
-
+int nos_atravessados=0;
 
 int *first_fit(Memory *memory, int sizeneeded){
     int position_found = -1;
@@ -9,6 +9,7 @@ int *first_fit(Memory *memory, int sizeneeded){
     int *beginend= (int *)calloc(2,sizeof(int));
     while(index<(sizeof(memory->data)/sizeof(int))){
         if(memory->data[index] == -1){
+            nos_atravessados++;
             position_found = index;
             for(i = index; i<(index + sizeneeded); i++){
                 if(memory->data[index]!=-1){
@@ -43,6 +44,7 @@ int *next_fit(Memory *memory, int sizeneeded, last *lastfit){
     {
         if (memory->data[i] == -1)
         {
+            nos_atravessados++;
             int can_allocate = 1;
             for (int j = i; j < i + sizeneeded && j < (sizeof(memory->data)/sizeof(int)); j++)
             {
@@ -72,6 +74,7 @@ int *next_fit(Memory *memory, int sizeneeded, last *lastfit){
     {
         if (memory->data[i] == -1)
         {
+            nos_atravessados++;
             int can_allocate = 1;
             for (int j = i; j < i + sizeneeded && j < (sizeof(memory->data)/sizeof(int)); j++)
             {
@@ -106,6 +109,7 @@ int *best_fit(Memory *memory, int sizeneeded){
     {
         if (memory->data[i] == -1)
         {
+            nos_atravessados++;
             int free_block_size = 0;
             int j = i;
             while (j < (sizeof(memory->data)/sizeof(int)) && memory->data[j] == -1)
@@ -141,6 +145,7 @@ int *worst_fit(Memory *memory, int sizeneeded){
     {
         if (memory->data[i] == -1)
         {
+            nos_atravessados++;
             int free_block_size = 0;
             int j = i;
             while (j < (sizeof(memory->data)/sizeof(int)) && memory->data[j] == -1)
@@ -169,61 +174,136 @@ int *worst_fit(Memory *memory, int sizeneeded){
     return beginend; // Falha na alocação
 }
 
-int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvect,last *ult) {
+int allocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvect, last *ult) {
     int choice;
-    
-    ult->lastfit = 10;
     int *result = NULL;
-    process.simulated_process.int_quantity = 3;
-    result = (int*)calloc(2,sizeof(int));
 
-    puts("escolha uma das estrategias de alocacao abaixo:");
-    puts("1 - first fit");
-    puts("2 - next fit");
-    puts("3 - best fit");
-    puts("4 - worst fit");
+    // Inicializa a estrutura last
+    ult->lastfit = 10;
+    
+    // Definição da quantidade de processos
+    process.simulated_process.int_quantity = 3;
+    
+    // Aloca memória para o resultado
+    result = (int*)calloc(2, sizeof(int));
+    result[0]=-1;
+
+    // Exibe as opções de alocação
+    puts("Escolha uma das estratégias de alocação abaixo:");
+    puts("1 - First fit");
+    puts("2 - Next fit");
+    puts("3 - Best fit");
+    puts("4 - Worst fit");
     scanf("%d", &choice);
 
+    // Seleciona a estratégia de alocação
     switch (choice) {
-    case 1:
-        result = first_fit(mem, process.simulated_process.int_quantity);
-        break;
-    case 2:
-        result = next_fit(mem, process.simulated_process.int_quantity, ult);
-        break;
-    case 3:
-        result = best_fit(mem, process.simulated_process.int_quantity);
-        break;
-    case 4:
-        result = worst_fit(mem, process.simulated_process.int_quantity);
-        break;
-    default:
-        puts("Opcao invalida");
+        case 1:
+            result = first_fit(mem, process.simulated_process.int_quantity);
+            break;
+        case 2:
+            result = next_fit(mem, process.simulated_process.int_quantity, ult);
+            break;
+        case 3:
+            result = best_fit(mem, process.simulated_process.int_quantity);
+            break;
+        case 4:
+            result = worst_fit(mem, process.simulated_process.int_quantity);
+            break;
+        default:
+            puts("Opção inválida");
+            return -1;
+    }
+
+    // Verifica se a alocação foi bem-sucedida
+    if (result[0] == -1) {
+        puts("Falha na alocação");
         return -1;
     }
 
-    if (result == NULL) {
-        puts("Falha na alocacao");
-        return -1;
-    }
-    
-    printf("Estado atual da memoria:\n");
+    // Exibe o estado atual da memória
+    printf("Estado atual da memória:\n");
     for (int i = 0; i < MAX_TAM * 3; i++) {
         if (alocvect->endressAdress[i] == -1) {
             alocvect->endressAdress[i] = process.id;
-            alocvect->endressAdress[i+1] = result[0];
-            alocvect->endressAdress[i+2] = result[1];
+            alocvect->endressAdress[i + 1] = result[0];
+            alocvect->endressAdress[i + 2] = result[1];
 
-            printf("Resultado da alocacao id: %d \n", alocvect->endressAdress[i]);
-            printf("Resultado da alocacao indx: %d \n", alocvect->endressAdress[i+1]);
-            printf("Resultado da alocacao endx: %d \n", alocvect->endressAdress[i+2]);
-            break;  
+            printf("Resultado da alocação id: %d \n", alocvect->endressAdress[i]);
+            printf("Resultado da alocação índice: %d \n", alocvect->endressAdress[i + 1]);
+            printf("Resultado da alocação fim: %d \n", alocvect->endressAdress[i + 2]);
+            break;
         }
     }
-  
+
+    // Libera a memória alocada
+    free(result);
 
     return 0;
 }
+
+int deallocation_manager(Memory *mem, int process_id, alocationVector *alocvect) {
+    int start_index = -1;
+    int end_index = -1;
+
+    // Find the allocation entry for the given process_id
+    for (int i = 0; i < MAX_TAM * 3; i += 3) {
+        if (alocvect->endressAdress[i] == process_id) {
+            start_index = alocvect->endressAdress[i + 1];
+            end_index = alocvect->endressAdress[i + 2];
+            
+            // Clear the allocation entry
+            alocvect->endressAdress[i] = -1;
+            alocvect->endressAdress[i + 1] = -1;
+            alocvect->endressAdress[i + 2] = -1;
+            
+            break;
+        }
+    }
+
+    if (start_index == -1 || end_index == -1) {
+        printf("ID do processo %d não encontrado no vetor de alocação.\n", process_id);
+
+        return -1;
+    }
+
+    // Deallocate memory
+    for (int i = start_index; i <= end_index; i++) {
+        mem->data[i] = 0;  // Assuming 0 represents free memory
+    }
+
+    printf("Memória desalocada para o processo ID %d do índice %d ao %d\n", process_id, start_index, end_index);
+
+
+    // Print current memory state
+    printf("Estado atual da memória:\n");
+    for (int i = 0; i < MAX_TAM; i++) {
+        printf("%d ",mem->data[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
+
+
+
+
+// Função para calcular o tempo médio de alocação
+double calculate_average_allocation_time(int num_allocations) {
+    if (num_allocations == 0) {
+        printf("Nenhuma alocação foi feita.\n");
+        // Se não houver alocações, o tempo médio não pode ser calculado
+        return 0.0;
+    }
+
+    // Calcula o tempo médio
+    double average_nodes_traversed = (double)nos_atravessados / num_allocations;
+    
+    return average_nodes_traversed;  // Retorna o tempo médio de alocação
+}
+
+
+
 /*
 int main(){
     Memory mem;

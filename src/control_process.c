@@ -121,6 +121,20 @@ void show_menu_escalonamento() {
     printf("Escolha uma opção (1 ou 2): ");
 }
 
+void show_menu_alocacao() {
+    printf("\n");
+    printf("╔═════════════════════════════════════╗\n");
+    printf("║ Qual método de alocação usar?       ║\n");
+    printf("╠═════════════════════════════════════╣\n");
+    printf("║ 1. First Fit                        ║\n");
+    printf("║ 2. Next Fit                         ║\n");
+    printf("║ 3. Best Fit                         ║\n");
+    printf("║ 4. Worst Fit                        ║\n");
+    printf("╚═════════════════════════════════════╝\n");
+    printf("Escolha uma opção (1, 2, 3 ou 4): ");
+}
+
+
 void show_main_menu() {
     printf("\n");
     printf("╔════════════════════════════════╗\n");

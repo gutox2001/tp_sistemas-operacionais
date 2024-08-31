@@ -1,7 +1,5 @@
-#ifndef MEMORY
-#define MEMORY
-
-#include "memory_alocation.h"
+#ifndef MEMORY_H
+#define MEMORY_H
 
 #define MAX_TAM 100
 
@@ -10,6 +8,10 @@ typedef struct Memory
     int data[MAX_TAM];
 } Memory;
 
+typedef struct vector {
+    int endressAdress[300];
+} alocationVector;
+
 void initialize_memory(Memory *memory, alocationVector *vect);
 
-#endif //MEMORY
+#endif // MEMORY_H
