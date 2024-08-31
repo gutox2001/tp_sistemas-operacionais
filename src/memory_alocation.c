@@ -171,10 +171,7 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector alocvect
     int choice;
     last ult; // next fit
     ult.lastfit=10;
-    int *x1;
-    int *x2;
-    int *x3;
-    int *x4;
+    int *result = NULL;
     process.simulated_process.int_quantity=3;
     puts("escolha uma das estrategias de alocação abaixo:");
     puts("1 - first fit");
@@ -186,42 +183,40 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector alocvect
     switch (choice)
     {
     case 1:
-        x1=first_fit(mem,process.simulated_process.int_quantity);
+        result=first_fit(mem,process.simulated_process.int_quantity);
         break;
     case 2:
-        x2=next_fit(mem,process.simulated_process.int_quantity,&ult);
+        result=next_fit(mem,process.simulated_process.int_quantity,&ult);
         break;
     case 3:
-        x3=best_fit(mem,process.simulated_process.int_quantity);
+        result=best_fit(mem,process.simulated_process.int_quantity);
         break;
     case 4:
-        x4=worst_fit(mem,process.simulated_process.int_quantity);
+        result=worst_fit(mem,process.simulated_process.int_quantity);
         break;
     
     default:
         break;
     }
 
-        printf("Estado atual da memória:\n");
+     if (result == NULL) {
+        puts("Falha na alocação");
+        return -1;
+    }
+
+    printf("Estado atual da memória:\n");
     for (int i = 0; i < MAX_TAM; i++) {
         printf("%d ", mem->data[i]);
         if(i%20==0 && i> 1){
             printf("\n");
         }
     }
-    printf("\n");
-    puts("first fit");
-    printf("%d\n",*x1);
-    puts("next fit");
-    printf("%d\n",*x2);
-    puts("best fit");
-    printf("%d\n",*x3);
-    puts("worst fit");
-    printf("%d\n",*x4);
-
+  
+    printf("Resultado da alocação: %d\n", *result);
 
     return 0;
 }
+
 int main(){
     Memory mem;
     ItemProcess item;
