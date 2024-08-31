@@ -71,7 +71,7 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
         process_manager.process_table.item_process[0].process_state = Execucao;
 
         // Instancia o primeiro processe simulado
-        first_simulated_process = initialize_simulated_process("data/first_process.txt", 1);
+        first_simulated_process = initialize_simulated_process("data/arquivo.txt", 1);
         // Percorre a string de entrada passando os comandos para o gerenciador de processos
         create_new_item_process(0, 0, first_simulated_process, 0, &process_manager.process_table);
         new_item.process_table_index = 1;
@@ -81,16 +81,20 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
         add_item_to_fila(new_item, &process_manager.ExecutionState);
         process_manager.process_table.item_process[1].process_state = Execucao;
 
-        // Instancia o segundo processe simulado TESTE!
-        second_simulated_process = initialize_simulated_process("data/first_process.txt", 2);
-        // Percorre a string de entrada passando os comandos para o gerenciador de processos
-        create_new_item_process(1, 0, second_simulated_process, 0, &process_manager.process_table);
-        new_item.process_table_index = 2;
-        new_item.priority = &process_manager.process_table.item_process[2].priority;
+        add_process_to_cpu(&process_manager.cpu_list[0], &process_manager.process_table.item_process[1]);
 
-        // Colocar o processo na CPU e o adiciona na fila de execução. Depois o executa
-        add_item_to_fila(new_item, &process_manager.ExecutionState);
-        process_manager.process_table.item_process[2].process_state = Execucao;
+        // Instancia o segundo processe simulado TESTE!
+        // second_simulated_process = initialize_simulated_process("data/first_process.txt", 2);
+        // // Percorre a string de entrada passando os comandos para o gerenciador de processos
+        // create_new_item_process(1, 0, second_simulated_process, 0, &process_manager.process_table);
+        // new_item.process_table_index = 2;
+        // new_item.priority = &process_manager.process_table.item_process[2].priority;
+
+        // // Colocar o processo na CPU e o adiciona na fila de execução. Depois o executa
+        // add_item_to_fila(new_item, &process_manager.ExecutionState);
+        // process_manager.process_table.item_process[2].process_state = Execucao;
+
+        // add_process_to_cpu(&process_manager.cpu_list[1], &process_manager.process_table.item_process[2]);
         
         run_commands(&process_manager, receive_string, selected_escalonador, &command_index);
         // return;

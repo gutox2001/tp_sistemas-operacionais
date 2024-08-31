@@ -14,12 +14,16 @@ void initialize_process_manager(ProcessManager *process_manager, CPU *cpu_list) 
 }
 
 void troca_de_contexto(ProcessManager *process_manager, CPU *cpu, State old_process_new_state, char *receive_string, int selected_escalonador, int *command_index) {
+    TypeItem new_process_item;
+
     if (cpu->actual_process != NULL) {
         // Salva o estado do processo atual na tabela de processos
         process_manager->process_table.item_process[cpu->actual_process->id].cpu_time = cpu->quantum;
         process_manager->process_table.item_process[cpu->actual_process->id].program_counter = cpu->program_counter;
         process_manager->process_table.item_process[cpu->actual_process->id].simulated_process = cpu->actual_process->simulated_process;
         process_manager->process_table.item_process[cpu->actual_process->id].priority = cpu->actual_process->priority;
+
+        // printf("PRIORIDADE DA CPU: %d", cpu->actual_process->priority);
 
         // Diminui a prioridade se a fatia de tempo foi completamente usada
         int max_time_slice = get_time_slice_by_priority(process_manager->process_table.item_process[cpu->actual_process->id].priority);
@@ -49,20 +53,19 @@ void troca_de_contexto(ProcessManager *process_manager, CPU *cpu, State old_proc
 
     clean_cpu(cpu);
 
-    //
     int new_process_index = remove_item_from_fila(&process_manager->ReadyState);
+    new_process_item.priority = &process_manager->process_table.item_process[new_process_index].priority;
+    new_process_item.process_table_index = new_process_index;
 
-    // TODO: Verificar essa criação de item da lista!
-    TypeItem new_process_item = {new_process_index, &process_manager->process_table.item_process[new_process_index].priority};
+    printf("Processo que será adicionado à CPU: %d\n", new_process_index);
+    printf("Seu program counter: %d\n", process_manager->process_table.item_process[new_process_index].program_counter);
 
     // Colocar o processo na CPU e o adiciona na fila de execução. Depois continua a execução do processo na respectiva função 'run_processes'
     add_process_to_cpu(cpu, &process_manager->process_table.item_process[new_process_index]);
     add_item_to_fila(new_process_item, &process_manager->ExecutionState);
     process_manager->process_table.item_process[new_process_index].process_state = Execucao;
 
-    // run_process(process_manager, cpu, &process_manager->process_table.item_process[new_process_index], receive_string, selected_escalonador, is_system_running, command_index);
     printf("Troca de contexto realizada com sucesso. Novo processo em execução.\n");
-
     return;
 }
 
@@ -129,6 +132,9 @@ void run_selected_escalonador(ProcessManager *process_manager, CPU *cpu, char *r
 }
 
 void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process, char current_command, int selected_escalonador, char *input_command_string, int *command_index) {
+    TypeItem new_item;
+    SimulatedProcess new_simulated_process;
+
     switch (current_command) {
         case 'U': {
             // Executar a próxima instrução do processo
@@ -168,7 +174,10 @@ void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, 
                     // Nessa instrução o escalonador tem que executar
 
                     process->process_state = Bloqueado;
-                    troca_de_contexto(process_manager, cpu, Bloqueado, input_command_string, selected_escalonador, command_index);
+                    // Retirar da fila de execução colocar na fila de bloqueados
+                    // Chamar o escalonador para escolher o próximo processo
+
+                    // troca_de_contexto(process_manager, cpu, Bloqueado, input_command_string, selected_escalonador, command_index);
 
                     printf("Instrução %c executada com sucesso no processo %d\n", current_instruction.instruction_char, process->id);
                     break;
@@ -188,11 +197,26 @@ void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, 
 
                 case 'F':
                     // Criar um novo processo baseado no pai
+                    int new_process_program_counter = process->program_counter + 1;
+                    printf("Program counter do novo processo %d\n", new_process_program_counter);
 
-                    create_new_item_process(process->id, process->program_counter + 1, process->simulated_process, process->priority, &process_manager->process_table);
+                    printf("Último processo na tabela no momento: %d\n", process_manager->process_table.last_item);
+                    
+                    new_simulated_process.instruction_quantity = process->simulated_process.instruction_quantity;
+                    new_simulated_process.int_quantity = process->simulated_process.int_quantity;
+                    new_simulated_process.time_blocked = 0;
+                    new_simulated_process.process_instructions = process->simulated_process.process_instructions;
+                    new_simulated_process.process_id = process_manager->process_table.last_item;
+                    new_simulated_process.priority = process->priority;
+                    new_simulated_process.program_counter = new_process_program_counter;
+
+                    create_new_item_process(process->id, new_process_program_counter, new_simulated_process, new_simulated_process.priority, &process_manager->process_table);
+
+                    printf("LAST ITEM DEPOIS: %d\n", process_manager->process_table.last_item);
 
                     // Adicionar o novo processo na fila de prontos
-                    TypeItem new_item = {process_manager->process_table.last_item, &process_manager->process_table.item_process[process_manager->process_table.last_item].priority};
+                    new_item.priority = &process_manager->process_table.item_process[process_manager->process_table.last_item].priority;
+                    new_item.process_table_index = process_manager->process_table.last_item-1;
 
                     add_item_to_fila(new_item, &process_manager->ReadyState);
                     process_manager->process_table.item_process[new_item.process_table_index].process_state = Pronto;
@@ -200,21 +224,21 @@ void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, 
                     // Ajustar prioridade do pai, reduzindo-a
                     process->priority = process->priority + 1;
 
-                    printf("Novo processo criado!\n");
-                    show_process_table(process_manager->process_table);
-
                     // Verifica se há CPU disponível
                     int index_free_cpu = is_any_cpu_available(process_manager);
 
-                    if (index_free_cpu != -1) {
-                        run_selected_escalonador(process_manager, &process_manager->cpu_list[index_free_cpu], input_command_string, selected_escalonador, command_index);
-                    } else {
-                        run_selected_escalonador(process_manager, cpu, input_command_string, selected_escalonador, command_index);
-                    }
+                    run_selected_escalonador(process_manager, &process_manager->cpu_list[index_free_cpu], input_command_string, selected_escalonador, command_index);
 
                     printf("Instrução %c executada com sucesso no processo %d\n", current_instruction.instruction_char, process->id);
 
-                    printf("Chegou aqui\n");
+                    printf("\nNovo processo criado! Tabela de processos:");
+                    show_process_table(process_manager->process_table);
+
+                    printf("\nProcessos em execução no momento, após a criação do novo processo: \n");
+                    show_fila(&process_manager->ExecutionState);
+
+                    printf("\nCPU atribuída ao novo processo: ");
+                    show_cpu(process_manager->cpu_list[index_free_cpu]);
                     break;
 
                 case 'R':
@@ -289,10 +313,7 @@ void run_commands(ProcessManager *process_manager, char *input_command_string, i
     ItemProcess *current_process;
     CPU *cpu_first_process = &process_manager->cpu_list[0];
 
-    add_process_to_cpu(&process_manager->cpu_list[0], &process_manager->process_table.item_process[1]);
     current_cell_execution_process = process_manager->ExecutionState.start;
-
-    add_process_to_cpu(&process_manager->cpu_list[1], &process_manager->process_table.item_process[2]);
 
     if (current_cell_execution_process == NULL) {
         printf("Nenhum inicial processo em execução.\n");
@@ -320,6 +341,8 @@ void run_commands(ProcessManager *process_manager, char *input_command_string, i
 
                 printf("\nProcesso em execução no momento: %d", current_process->id);
                 run_command_in_selected_process(process_manager, process_cpu, current_process, current_command, selected_escalonador, input_command_string, command_index);
+
+                printf("Voltou aqui\n");
             }
         }
 
@@ -328,13 +351,26 @@ void run_commands(ProcessManager *process_manager, char *input_command_string, i
 }
 
 int is_any_cpu_available(ProcessManager *process_manager) {
+    int selected_cpu_index = -1;
+    int biggest_cpu_time = 0;
+
     for (int i = 0; i < QUANT_CPU; i++) {
         if (process_manager->cpu_list[i].actual_process == NULL) {
-            printf("CPU %d está disponível.\n", i);
-            return i;
+            printf("\nCPU %d está disponível.\n", i);
+            selected_cpu_index = i;
+            return selected_cpu_index;
         }
     }
-    return -1;
+
+    printf("Todas as CPUs estão ocupadas.\n");
+    for (int j = 0; j < QUANT_CPU; j++) {
+        if (process_manager->cpu_list[j].actual_process->cpu_time > biggest_cpu_time) {
+            selected_cpu_index = j;
+        }
+    }
+
+    printf("CPU %d será selecionada para troca de contexto.\n", selected_cpu_index);
+    return selected_cpu_index;
 }
 
 int get_time_slice_by_priority(int priority) {
@@ -383,7 +419,7 @@ void verify_process_block_time(ProcessManager *process_manager) {
             } else {
                 // Se o tempo bloqueado acabou, o processo é movido para a fila de processos prontos
                 TypeItem new_item = {k, &process_manager->process_table.item_process[k].priority};
-                
+
                 process_manager->process_table.item_process[k].process_state = Pronto;
                 add_item_to_fila(new_item, &process_manager->ReadyState);
             }
