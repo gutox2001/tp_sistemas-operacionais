@@ -29,5 +29,5 @@ int main() {
     } while (type_input != 1 && type_input != 2);
 
     initialize_control_process(type_input, type_escalonamento, string_input, type_escalonamento);
-    return 1;
+    return 0;
 }

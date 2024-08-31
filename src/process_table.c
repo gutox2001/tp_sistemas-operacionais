@@ -84,7 +84,7 @@ void show_item_process(ItemProcess process) {
 // Função para exibir a tabela de processos
 void show_process_table(ProcessTable process_table) {
     printf(BOLD "\n+----+------+------------+--------+\n" RESET);
-    printf(BLUE "| ID | Pai  | Prioridade | Estado |\n" RESET);
+    printf(BLUE "| ID | Pai  | Prioridade | Estados |\n" RESET);
     printf(BOLD "+----+------+------------+--------+\n" RESET);
 
     for (int i = 0; i < process_table.last_item; i++) {
@@ -96,6 +96,12 @@ void show_process_table(ProcessTable process_table) {
     }
 
     printf(BOLD "+----+------+------------+--------+\n" RESET);
+
+    for(int i = 0; i < process_table.last_item; i++){
+        show_item_process(process_table.item_process[i]);
+    }
+
+    
 }
 
 int get_first_empty_position(ProcessTable *process_table) {

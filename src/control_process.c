@@ -143,13 +143,13 @@ void read_terminal_input(char *return_char) {
 
     do {
         scanf(" %c", &input);
-        if (input >= 97 && input <= 120) {
+        if (input >= 97 && input <= 122) {
             input = input - 32;
         }
         return_char[i] = input;
 
         strcat(return_char, " ");
-        i++;
+        i+=2;
     } while (input != 'M');
 
     printf("Entradas obtidas: %s", return_char);
