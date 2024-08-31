@@ -24,6 +24,6 @@ void add_process_to_cpu(CPU *cpu, ItemProcess *process);
 void clean_cpu(CPU *cpu);
 void show_cpu(CPU cpu);
 
-int run_instruction(CPU *cpu, int mem_index, char instruction, int value);
+int run_instruction(CPU *cpu, int mem_index, char instruction, int value, alocationVector *vect);
 
 #endif //CPU_H

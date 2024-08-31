@@ -14,7 +14,7 @@ int *first_fit(Memory *memory, int sizeneeded);
 int *next_fit(Memory *memory, int sizeneeded, last *lastfit);
 int *best_fit(Memory *memory, int sizeneeded);
 int *worst_fit(Memory *memory, int sizeneeded);
-int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvect, last *ult);
+int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvect, last *ult,int type_alocacao);
 int deallocation_manager(Memory *mem, int process_id, alocationVector *alocvect);
 double calculate_average_allocation_time(int num_allocations);
 #endif // MEMORY_ALOCATION_H

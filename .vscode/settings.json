@@ -12,6 +12,7 @@
         "typeinfo": "c",
         "cpu.h": "c",
         "colors.h": "c",
-        "memory_alocation.h": "c"
+        "memory_alocation.h": "c",
+        "memory.h": "c"
     }
 }

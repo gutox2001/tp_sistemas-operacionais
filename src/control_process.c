@@ -1,7 +1,7 @@
 #include "../libs/control_process.h"
 
 
-void initialize_control_process(int type_input, int type_escalonamento, char *send_string, int selected_escalonador) {
+void initialize_control_process(int type_input, int type_escalonamento, char *send_string, int selected_escalonador, int type_alocacao) {
     clock_t start = clock();
 
     int fd[2];  // Pipe para comunicação entre pai e filho
@@ -9,6 +9,7 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
 
     Memory memory;  // Memória do sistema
     alocationVector vect;  // Vetor de alocação
+    last ult;
     CPU CPU_list[QUANT_CPU];
     ProcessManager process_manager;  // Gerenciador de processos do sistema
     SimulatedProcess control_process;
@@ -98,7 +99,7 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
 
         // add_process_to_cpu(&process_manager.cpu_list[1], &process_manager.process_table.item_process[2]);
         
-        run_commands(&process_manager, receive_string, selected_escalonador, &command_index);
+        run_commands(&process_manager, receive_string, selected_escalonador, &command_index, &vect, &ult, type_alocacao);
         // return;
     }
 

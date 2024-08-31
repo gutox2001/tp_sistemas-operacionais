@@ -4,6 +4,7 @@
 #include "cpu.h"
 #include "fila.h"
 #include "process_table.h"
+#include "memory_alocation.h"
 
 typedef struct ProcessManager {
     TypeFila ReadyState;
@@ -33,9 +34,9 @@ void escalona_fcfs(ProcessManager *process_manager, CPU *cpu, char *receive_stri
 void run_selected_escalonador(ProcessManager *process_manager, CPU *cpu, char *receive_string, int selected_escalonador, int *command_index);
 
 //Os processos são executados de acordo a lista de processos em execução.
-void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process, char current_command, int selected_escalonador, char *input_command_string, int *command_index);
+void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process, char current_command, int selected_escalonador, char *input_command_string, int *command_index, alocationVector *vect, last *ult,int type_alocacao);
 
-void run_commands(ProcessManager *process_manager, char *input_command_string, int selected_escalonador, int *command_index);
+void run_commands(ProcessManager *process_manager, char *input_command_string, int selected_escalonador, int *command_index, alocationVector *vect, last *ult,int type_alocacao);
 
 void sort_fila_by_priority(TypeFila *fila);
 

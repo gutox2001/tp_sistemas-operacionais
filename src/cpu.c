@@ -83,8 +83,15 @@ void show_cpu(CPU cpu) {
     printf("\n" BOLD "====================================\n\n" RESET);
 }
 
-int run_instruction(CPU *cpu, int mem_index, char instruction, int value) {
-    mem_index += cpu->index_mem_init;
+int run_instruction(CPU *cpu, int mem_index, char instruction, int value, alocationVector *vect) {
+    for(int i = 0; i < 300; i += 3){
+        if(vect->endressAdress[i] == cpu->actual_process->id){
+            mem_index += vect->endressAdress[i+1];
+            break;
+        }
+    }
+    
+    //mem_index += cpu->index_mem_init;
     
     switch (instruction) {
         case 'A':

@@ -5,6 +5,7 @@ int main() {
     char string_input[TAM_MAX_MNS] = "";
     int type_input = 0;
     int type_escalonamento = 0;
+    int type_alocacao = 0;
 
     do {
         show_main_menu();
@@ -12,6 +13,9 @@ int main() {
 
         show_menu_escalonamento();
         scanf("%d", &type_escalonamento);
+
+        show_menu_alocacao();
+        scanf("%d", &type_alocacao);
 
         switch (type_input) {
             case 1:
@@ -28,6 +32,6 @@ int main() {
         }
     } while (type_input != 1 && type_input != 2);
 
-    initialize_control_process(type_input, type_escalonamento, string_input, type_escalonamento);
+    initialize_control_process(type_input, type_escalonamento, string_input, type_escalonamento, type_alocacao);
     return 0;
 }

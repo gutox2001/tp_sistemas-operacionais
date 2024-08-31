@@ -174,30 +174,23 @@ int *worst_fit(Memory *memory, int sizeneeded){
     return beginend; // Falha na alocação
 }
 
-int allocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvect, last *ult) {
-    int choice;
+int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvect, last *ult, int type_alocacao) {
+    //int choice;
     int *result = NULL;
 
     // Inicializa a estrutura last
-    ult->lastfit = 10;
+    //ult->lastfit = 10;
     
     // Definição da quantidade de processos
-    process.simulated_process.int_quantity = 3;
+    //process.simulated_process.int_quantity = 3;
     
     // Aloca memória para o resultado
     result = (int*)calloc(2, sizeof(int));
     result[0]=-1;
 
-    // Exibe as opções de alocação
-    puts("Escolha uma das estratégias de alocação abaixo:");
-    puts("1 - First fit");
-    puts("2 - Next fit");
-    puts("3 - Best fit");
-    puts("4 - Worst fit");
-    scanf("%d", &choice);
 
     // Seleciona a estratégia de alocação
-    switch (choice) {
+    switch (type_alocacao) {
         case 1:
             result = first_fit(mem, process.simulated_process.int_quantity);
             break;
@@ -211,7 +204,7 @@ int allocation_manager(Memory *mem, ItemProcess process, alocationVector *alocve
             result = worst_fit(mem, process.simulated_process.int_quantity);
             break;
         default:
-            puts("Opção inválida");
+            puts("Erro de escolha de alocacao");
             return -1;
     }
 
@@ -222,7 +215,7 @@ int allocation_manager(Memory *mem, ItemProcess process, alocationVector *alocve
     }
 
     // Exibe o estado atual da memória
-    printf("Estado atual da memória:\n");
+    printf("bolo %d Estado atual da memória:\n", nos_atravessados);
     for (int i = 0; i < MAX_TAM * 3; i++) {
         if (alocvect->endressAdress[i] == -1) {
             alocvect->endressAdress[i] = process.id;

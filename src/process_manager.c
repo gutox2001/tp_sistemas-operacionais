@@ -35,7 +35,7 @@ void troca_de_contexto(ProcessManager *process_manager, CPU *cpu, State old_proc
         // Atualiza o estado do processo na tabela de processos
         process_manager->process_table.item_process[cpu->actual_process->id].process_state = old_process_new_state;
 
-        // Remove o processo do Estado de Execução e o coloca na fila de processos prontos ou bloqueados
+        // Remove o processo do /Estado de Execução e o coloca na fila de processos prontos ou bloqueados
         if (old_process_new_state == Bloqueado) {
             int old_process_index = remove_item_from_fila(&process_manager->ExecutionState);
             TypeItem new_item = {old_process_index, &process_manager->process_table.item_process[old_process_index].priority};
@@ -131,7 +131,7 @@ void run_selected_escalonador(ProcessManager *process_manager, CPU *cpu, char *r
     }
 }
 
-void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process, char current_command, int selected_escalonador, char *input_command_string, int *command_index) {
+void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process, char current_command, int selected_escalonador, char *input_command_string, int *command_index, alocationVector *vect, last *ult, int type_alocacao) {
     TypeItem new_item;
     SimulatedProcess new_simulated_process;
 
@@ -151,11 +151,13 @@ void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, 
                     cpu->quantum++;
 
                     printf("Instrução %c executada com sucesso no processo %d\n", current_instruction.instruction_char, process->id);
+                    alocation_manager(cpu->memory,*process,vect,ult, type_alocacao);
+                    
                     break;
 
                 case 'D':
                     printf("Executando a instrução D: %d\n", current_instruction.index);
-                    run_instruction(cpu, current_instruction.index, current_instruction.instruction_char, 0);
+                    run_instruction(cpu, current_instruction.index, current_instruction.instruction_char, 0, vect);
 
                     printf("Instrução %c executada com sucesso no processo %d\n", current_instruction.instruction_char, process->id);
                     break;
@@ -164,7 +166,7 @@ void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, 
                 case 'S':
                 case 'V':
                     printf("Executando a instrução %c: %d\n", current_instruction.instruction_char, current_instruction.index);
-                    run_instruction(cpu, current_instruction.index, current_instruction.instruction_char, current_instruction.value);
+                    run_instruction(cpu, current_instruction.index, current_instruction.instruction_char, current_instruction.value, vect);
 
                     printf("Instrução %c executada com sucesso no processo %d\n", current_instruction.instruction_char, process->id);
                     break;
@@ -300,7 +302,7 @@ void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, 
     }
 }
 
-void run_commands(ProcessManager *process_manager, char *input_command_string, int selected_escalonador, int *command_index) {
+void run_commands(ProcessManager *process_manager, char *input_command_string, int selected_escalonador, int *command_index, alocationVector *vect, last *ult, int type_alocacao) {
     int index_free_cpu;
 
     printf("Lista de comandos: %s\n", input_command_string);
@@ -340,7 +342,7 @@ void run_commands(ProcessManager *process_manager, char *input_command_string, i
                 current_process = process_cpu->actual_process;
 
                 printf("\nProcesso em execução no momento: %d", current_process->id);
-                run_command_in_selected_process(process_manager, process_cpu, current_process, current_command, selected_escalonador, input_command_string, command_index);
+                run_command_in_selected_process(process_manager, process_cpu, current_process, current_command, selected_escalonador, input_command_string, command_index, vect, ult, type_alocacao);
 
                 printf("Voltou aqui\n");
             }
