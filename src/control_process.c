@@ -1,5 +1,6 @@
 #include "../libs/control_process.h"
 
+
 void initialize_control_process(int type_input, int type_escalonamento, char *send_string, int selected_escalonador) {
     clock_t start = clock();
 
@@ -7,6 +8,7 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
     pid_t pid;
 
     Memory memory;  // Memória do sistema
+    alocationVector vect;  // Vetor de alocação
     CPU CPU_list[QUANT_CPU];
     ProcessManager process_manager;  // Gerenciador de processos do sistema
     SimulatedProcess control_process;
@@ -15,7 +17,7 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
     ItemProcess new_item_process;              // Item processo da tabela de processos
 
     // Inicializa a memória do sistema
-    initialize_memory(&memory);
+    initialize_memory(&memory, &vect);
 
     for (int i = 0; i < QUANT_CPU; i++) {
         int index_mem_init = (50 * i);

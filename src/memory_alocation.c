@@ -1,4 +1,5 @@
 #include "../libs/memory_alocation.h"
+#include "../libs/memory.h"
 
 
 int *first_fit(Memory *memory, int sizeneeded){
@@ -16,9 +17,9 @@ int *first_fit(Memory *memory, int sizeneeded){
                 }
             }
             if(i==sizeneeded){
-                for(i = index; i<(index + sizeneeded); i++){
+                /*for(i = index; i<(index + sizeneeded); i++){
                 memory->data[i]=1;
-                }
+                }*/
                 beginend[0]=position_found;
                 beginend[1]=position_found+sizeneeded;
                 return beginend;
@@ -53,10 +54,10 @@ int *next_fit(Memory *memory, int sizeneeded, last *lastfit){
             }
             if (can_allocate==1)
             {
-                for (int j = i; j < i + sizeneeded && j < (sizeof(memory->data)/sizeof(int)); j++)
+                /*for (int j = i; j < i + sizeneeded && j < (sizeof(memory->data)/sizeof(int)); j++)
                 {
                     memory->data[j] = 1;  // Aloca a memória (ex: 1 indica memória alocada)
-                }
+                }*/
                 lastfit->lastfit = i + sizeneeded;
                 beginend[0]=i;
                 beginend[1]=lastfit->lastfit; //se você não intendeu não se preocupe
@@ -82,10 +83,10 @@ int *next_fit(Memory *memory, int sizeneeded, last *lastfit){
             }
             if (can_allocate==1)
             {
-                for (int j = i; j < i + sizeneeded && j < (sizeof(memory->data)/sizeof(int)); j++)
+                /*for (int j = i; j < i + sizeneeded && j < (sizeof(memory->data)/sizeof(int)); j++)
                 {
                     memory->data[j] = 1;  // Aloca a memória
-                }
+                }*/
                 beginend[0]=i;
                 beginend[1]=lastfit->lastfit; //se você não intendeu não se preocupe
                 return beginend;
@@ -124,7 +125,7 @@ int *best_fit(Memory *memory, int sizeneeded){
     {
         for (int i = best_index; i < best_index + sizeneeded; i++)
         {
-            memory->data[i] = 1;  // Aloca a memória
+            //memory->data[i] = 1;  // Aloca a memória
                 beginend[0]=i;
                 beginend[1]=i+sizeneeded; //se você não intendeu não se preocupe
                 return beginend;
@@ -157,75 +158,86 @@ int *worst_fit(Memory *memory, int sizeneeded){
     }
     if (worst_index != -1)
     {
-        for (int i = worst_index; i < worst_index + sizeneeded; i++)
+        /*for (int i = worst_index; i < worst_index + sizeneeded; i++)
         {
             memory->data[i] = 1;  // Aloca a memória
-        }
+        }*/
         beginend[0]=worst_index;
         beginend[1]=worst_index+sizeneeded; //se você não intendeu não se preocupe
         return beginend;
     }
     return beginend; // Falha na alocação
 }
-int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvect){
+
+int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvect,last *ult) {
     int choice;
-    last ult; // next fit
-    ult.lastfit=10;
+    
+    ult->lastfit = 10;
     int *result = NULL;
-    process.simulated_process.int_quantity=3;
-    puts("escolha uma das estrategias de alocação abaixo:");
+    process.simulated_process.int_quantity = 3;
+    result = (int*)calloc(2,sizeof(int));
+
+    puts("escolha uma das estrategias de alocacao abaixo:");
     puts("1 - first fit");
     puts("2 - next fit");
     puts("3 - best fit");
     puts("4 - worst fit");
-    scanf("%d",&choice);
+    scanf("%d", &choice);
 
-    switch (choice)
-    {
+    switch (choice) {
     case 1:
-        result=first_fit(mem,process.simulated_process.int_quantity);
+        result = first_fit(mem, process.simulated_process.int_quantity);
         break;
     case 2:
-        result=next_fit(mem,process.simulated_process.int_quantity,&ult);
+        result = next_fit(mem, process.simulated_process.int_quantity, ult);
         break;
     case 3:
-        result=best_fit(mem,process.simulated_process.int_quantity);
+        result = best_fit(mem, process.simulated_process.int_quantity);
         break;
     case 4:
-        result=worst_fit(mem,process.simulated_process.int_quantity);
+        result = worst_fit(mem, process.simulated_process.int_quantity);
         break;
-    
     default:
-        break;
-    }
-
-     if (result == NULL) {
-        puts("Falha na alocação");
+        puts("Opcao invalida");
         return -1;
     }
 
-    printf("Estado atual da memória:\n");
-    for (int i = 0; i < MAX_TAM; i++) {
-        printf("%d ", mem->data[i]);
-        if(i%20==0 && i> 1){
-            printf("\n");
+    if (result == NULL) {
+        puts("Falha na alocacao");
+        return -1;
+    }
+    
+    printf("Estado atual da memoria:\n");
+    for (int i = 0; i < MAX_TAM * 3; i++) {
+        if (alocvect->endressAdress[i] == -1) {
+            alocvect->endressAdress[i] = process.id;
+            alocvect->endressAdress[i+1] = result[0];
+            alocvect->endressAdress[i+2] = result[1];
+
+            printf("Resultado da alocacao id: %d \n", alocvect->endressAdress[i]);
+            printf("Resultado da alocacao indx: %d \n", alocvect->endressAdress[i+1]);
+            printf("Resultado da alocacao endx: %d \n", alocvect->endressAdress[i+2]);
+            break;  
         }
     }
   
-    printf("Resultado da alocação: %d\n", *result);
 
     return 0;
 }
-
+/*
 int main(){
     Memory mem;
     ItemProcess item;
-    
 
+    alocationVector vect;
+    last ult;
+    for (int i = 0; i < MAX_TAM * 3; i++){
+        vect.endressAdress[i]=-1;
+    }
     initialize_memory(&mem);
-    alocation_manager(&mem,item);
+    alocation_manager(&mem,item,&vect,&ult);
  
 
     return 0;
-}
+}*/
 
