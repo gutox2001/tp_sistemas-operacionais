@@ -222,15 +222,15 @@ int alocation_manager(Memory *mem, ItemProcess process){
 
     return 0;
 }
-/*int main(){
+int main(){
     Memory mem;
     ItemProcess item;
     
-    int * endressAdress[200];
+
     initialize_memory(&mem);
     alocation_manager(&mem,item);
  
 
     return 0;
-}*/
+}
 
