@@ -15,4 +15,4 @@ int *first_fit(Memory *memory, int sizeneeded);
 int *next_fit(Memory *memory, int sizeneeded, last *lastfit);
 int *best_fit(Memory *memory, int sizeneeded);
 int *worst_fit(Memory *memory, int sizeneeded);
-int alocation_manager(Memory *mem, ItemProcess process);
+int alocation_manager(Memory *mem, ItemProcess process, alocationVector alocvect);

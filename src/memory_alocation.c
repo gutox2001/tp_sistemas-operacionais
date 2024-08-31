@@ -167,7 +167,7 @@ int *worst_fit(Memory *memory, int sizeneeded){
     }
     return beginend; // Falha na alocação
 }
-int alocation_manager(Memory *mem, ItemProcess process){
+int alocation_manager(Memory *mem, ItemProcess process, alocationVector alocvect){
     int choice;
     last ult; // next fit
     ult.lastfit=10;
