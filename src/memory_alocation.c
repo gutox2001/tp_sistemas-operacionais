@@ -2,23 +2,20 @@
 #include "../libs/memory.h"
 int nos_atravessados=0;
 
-
-
-
-
-
-
-
 int *first_fit(Memory *memory, int sizeneeded, alocationVector *alocvect){
     int position_found = -1;
     int index = 0;
     int i = 0;
     int flag = 0;
     int *beginend= (int *)calloc(2,sizeof(int));
+    beginend[0]=-1;
+    beginend[1]=-1;
+    
+    puts("----------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     while(index<(sizeof(memory->data)/sizeof(int))){
         if(memory->data[index] == -1){
             for(int i = 1;i < 300;i+=3){ //e assim mesmo confia
-                if(alocvect->endressAdress[i] < index && alocvect->endressAdress[i+1] >index){
+                if(alocvect->endressAdress[i] <= index && alocvect->endressAdress[i+1] >= index){
                     flag=-1;
                     index=alocvect->endressAdress[i+1] +1;
                 }
@@ -55,6 +52,8 @@ int *first_fit(Memory *memory, int sizeneeded, alocationVector *alocvect){
 int *next_fit(Memory *memory, int sizeneeded, last *lastfit, alocationVector *alocvect){
     int start_index = lastfit->lastfit;
     int *beginend= (int *)calloc(2,sizeof(int));
+    beginend[0]=-1;
+    beginend[1]=-1;
     int flag = 0;
     // Percorre a memória a partir do último índice usado
     for (int i = start_index; i < (sizeof(memory->data)/sizeof(int)); i++)
@@ -62,7 +61,7 @@ int *next_fit(Memory *memory, int sizeneeded, last *lastfit, alocationVector *al
         if (memory->data[i] == -1)
         {
             for(int j = 1;j < 300;j+=3){ //e assim mesmo confia
-                if(alocvect->endressAdress[j] < i && alocvect->endressAdress[j+1] >i){
+                if(alocvect->endressAdress[j] <= i && alocvect->endressAdress[j+1] >=i){
                     flag=-1;
                     i=alocvect->endressAdress[j+1] +1;
                 }
@@ -101,10 +100,10 @@ int *next_fit(Memory *memory, int sizeneeded, last *lastfit, alocationVector *al
         if (memory->data[i] == -1)
         {
 
-            for(int x = 1;x < 300;x+=3){ //e assim mesmo confia
-                if(alocvect->endressAdress[x] < i && alocvect->endressAdress[x+1] >i){
+            for(int j = 1;j < 300;j+=3){ //e assim mesmo confia
+                if(alocvect->endressAdress[j] <= i && alocvect->endressAdress[j+1] >=i){
                     flag=-1;
-                    i=alocvect->endressAdress[x+1] +1;
+                    i=alocvect->endressAdress[j+1] +1;
                 }
             }
             if(flag != -1){
@@ -143,13 +142,15 @@ int *best_fit(Memory *memory, int sizeneeded, alocationVector *alocvect){
     int best_index = -1;
     int best_size = (sizeof(memory->data)/sizeof(int)) + 1;
     int *beginend= (int *)calloc(2,sizeof(int));
+    beginend[0]=-1;
+    beginend[1]=-1;
     int flag = 0;
     for (int i = 0; i < (sizeof(memory->data)/sizeof(int)); i++)
     {
         if (memory->data[i] == -1)
         {
             for(int j = 1;j < 300;j+=3){ //e assim mesmo confia
-                if(alocvect->endressAdress[j] < i && alocvect->endressAdress[j+1] >i){
+                if(alocvect->endressAdress[j] <= i && alocvect->endressAdress[j+1] >=i){
                     flag=-1;
                     i=alocvect->endressAdress[j+1] +1;
                 }
@@ -190,6 +191,8 @@ int *worst_fit(Memory *memory, int sizeneeded, alocationVector *alocvect){
     int worst_index = -1;
     int worst_size = -1;
     int *beginend= (int *)calloc(2,sizeof(int));
+    beginend[0]=-1;
+    beginend[1]=-1;
     int flag = 0;
     for (int i = 0; i < (sizeof(memory->data)/sizeof(int)); i++)
     {
@@ -197,7 +200,7 @@ int *worst_fit(Memory *memory, int sizeneeded, alocationVector *alocvect){
         {
 
             for(int j = 1;j < 300;j+=3){ //e assim mesmo confia
-                if(alocvect->endressAdress[j] < i && alocvect->endressAdress[j+1] >i){
+                if(alocvect->endressAdress[j] <= i && alocvect->endressAdress[j+1] >=i){
                     flag=-1;
                     i=alocvect->endressAdress[j+1] +1;
                 }
@@ -236,48 +239,36 @@ int *worst_fit(Memory *memory, int sizeneeded, alocationVector *alocvect){
     return beginend; // Falha na alocação
 }
 
+
 int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvect, last *ult, int type_alocacao, ProcessTable *process_table, TypeFila *fila_prontos, TypeFila *fila_bloqueados, TypeFila *fila_execucao) {
-    //int choice;
     int *result = NULL;
-    int temp_program_counter = 0;
     ItemProcess temp_item_process;
     temp_item_process.id = -1;
-    
 
-    // Inicializa a estrutura last
-    //ult->lastfit = 10;
+    int vetor_processo_memoria[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     
-    // Definição da quantidade de processos
-    //process.simulated_process.int_quantity = 3;
-    
-    // Aloca memória para o resultado
-    result = (int*)calloc(2, sizeof(int));
-    result[0]=-1;
-
-
+    write_process_to_file(12, 13, 10, vetor_processo_memoria);
     // Seleciona a estratégia de alocação
     switch (type_alocacao) {
         case 1:
-            result = first_fit(mem, process.simulated_process.int_quantity,alocvect);
+            result = first_fit(mem, process.simulated_process.int_quantity, alocvect);
             break;
         case 2:
-            result = next_fit(mem, process.simulated_process.int_quantity, ult,alocvect);
+            result = next_fit(mem, process.simulated_process.int_quantity, ult, alocvect);
             break;
         case 3:
-            result = best_fit(mem, process.simulated_process.int_quantity,alocvect);
+            result = best_fit(mem, process.simulated_process.int_quantity, alocvect);
             break;
         case 4:
-            result = worst_fit(mem, process.simulated_process.int_quantity,alocvect);
+            result = worst_fit(mem, process.simulated_process.int_quantity, alocvect);
             break;
         default:
             puts("Erro de escolha de alocacao");
             return -1;
     }
-    
 
     // Verifica se a alocação foi bem-sucedida
-    if (result[0] == -1) {
-        // Buscar processo mais antigo
+    if (result == NULL || result[0] == -1) {
         int index_process_at_process_table = remove_item_from_fila(fila_bloqueados);
         if(index_process_at_process_table == -1) {
             index_process_at_process_table = remove_item_from_fila(fila_prontos);
@@ -285,43 +276,49 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvec
         if(index_process_at_process_table == -1) {
             index_process_at_process_table = remove_item_from_fila(fila_execucao);
         }
+        if(index_process_at_process_table == -1) {
+            puts("Nenhum processo disponível para remoção");
+            return -1;
+        }
+        
         temp_item_process = process_table->item_process[index_process_at_process_table];
         printf("Processo mais antigo: %d\n", temp_item_process.id);
-        // Chamar alocationManager novamente
-        alocation_manager(mem, process, alocvect, ult, type_alocacao, process_table, fila_prontos, fila_bloqueados, fila_execucao);
-        // Salvar processo na lista de prontos
+
+        // Salvar processo em disco
+        int vetor_processo_memoria[temp_item_process.simulated_process.int_quantity];
+        for(int i = 0; i < MAX_TAM * 3; i += 3) {
+            if(alocvect->endressAdress[i] == temp_item_process.id) {
+                for(int j = 0; j < temp_item_process.simulated_process.int_quantity; j++) {
+                    vetor_processo_memoria[j] = mem->data[alocvect->endressAdress[i+1+j]];
+                }
+                break;
+            }
+        }
+
+       
+
+        deallocation_manager(mem, temp_item_process.id, alocvect);
+
+        // Tentar alocar novamente
+        int ret = alocation_manager(mem, process, alocvect, ult, type_alocacao, process_table, fila_prontos, fila_bloqueados, fila_execucao);
+        if (ret == -1) {
+            puts("Falha na alocação mesmo após remover um processo");
+            return -1;
+        }
+        
+
+        // Salvar processo removido na lista de prontos
         TypeItem new_item;
         *new_item.priority = temp_item_process.priority;
         new_item.process_table_index = index_process_at_process_table;
         add_item_to_fila(new_item, fila_prontos);
-        // Salvar processo em disco
-        temp_item_process.id; // ID do processo
-        temp_item_process.simulated_process.program_counter; // linha 
-        temp_item_process.simulated_process.int_quantity; // quantidade de inteiros
-        int vetor_processo_memoria[process.simulated_process.int_quantity];
-        for(int i = 0; i < 300; i+= 3){
-            if(alocvect->endressAdress[i] == temp_item_process.id){
-                for(int j = 0; j < process.simulated_process.int_quantity; j++){
-                    vetor_processo_memoria[j] = mem->data[alocvect->endressAdress[i+1+j]];
-                }
-            }
-        }
-        //id->linha-> tam:5-> [32,2,1,-1,4]
 
-        //escreverNoArquivo("%d-%d-%d-", temp_item_process.id, temp_item_process.simulated_process.program_counter, temp_item_process.simulated_process.int_quantity, vetor_processo_memoria);
-        // Retirar da memória
-
-        /*write_process_to_file(temp_item_process.id, temp_item_process.simulated_process.program_counter, 
-                          temp_item_process.simulated_process.int_quantity, vetor_processo_memoria);*/
-
-        deallocation_manager(mem, temp_item_process.id, alocvect);
-        puts("Falha na alocação");
-        return -1;
+        return 0;
     }
 
     // Exibe o estado atual da memória
     printf("Estado atual da memória:\n");
-    for (int i = 0; i < MAX_TAM * 3; i++) {
+    for (int i = 0; i < MAX_TAM * 3; i += 3) {
         if (alocvect->endressAdress[i] == -1) {
             alocvect->endressAdress[i] = process.id;
             alocvect->endressAdress[i + 1] = result[0];
@@ -384,8 +381,6 @@ int deallocation_manager(Memory *mem, int process_id, alocationVector *alocvect)
 }
 
 
-
-
 // Função para calcular o tempo médio de alocação
 double calculate_average_allocation_time(int num_allocations) {
     if (num_allocations == 0) {
@@ -403,7 +398,7 @@ double calculate_average_allocation_time(int num_allocations) {
 
 void escreverNoArquivo(const char *conteudo) {
     // Nome do arquivo
-    const char *nomeDoArquivo = "D.txt";
+    const char *nomeDoArquivo = "Disco.txt";
     // Abre o arquivo no modo de escrita (write), cria o arquivo se não existir
     FILE *arquivo = fopen(nomeDoArquivo, "a");
     
@@ -419,6 +414,29 @@ void escreverNoArquivo(const char *conteudo) {
     // Fecha o arquivo
     fclose(arquivo);
     printf("Conteúdo escrito no arquivo %s com sucesso.\n", nomeDoArquivo);
+}
+
+
+void write_process_to_file(int process_id, int program_counter, int int_quantity, int *memory_vector) {
+    // Create a buffer to hold the formatted output
+    char formatted_output[1024]; // Adjust size as needed
+
+    // Start formatting the output
+    int offset = sprintf(formatted_output, "%d-%d-%d-[", process_id, program_counter, int_quantity);
+
+    // Append the contents of the memory vector to the formatted string
+    for (int i = 0; i < int_quantity; i++) {
+        if (i != 0) {
+            offset += sprintf(formatted_output + offset, ",");
+        }
+        offset += sprintf(formatted_output + offset, "%d", memory_vector[i]);
+    }
+
+    // Close the array format
+    sprintf(formatted_output + offset, "]\n");
+
+    // Write the formatted string to the file
+    escreverNoArquivo(formatted_output);
 }
 
 /*
