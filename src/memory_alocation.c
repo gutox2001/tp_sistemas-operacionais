@@ -270,10 +270,10 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvec
         if(index_process_at_process_table == -1) {
             index_process_at_process_table = remove_item_from_fila(fila_prontos);
         }
-        else if(index_process_at_process_table == -1) {
+        if(index_process_at_process_table == -1) {
             index_process_at_process_table = remove_item_from_fila(fila_execucao);
         }
-        else if(index_process_at_process_table == -1) {
+        if(index_process_at_process_table == -1) {
             puts("Nenhum processo disponível para remoção");
             return -1;
         }
@@ -442,7 +442,7 @@ void read_and_write_to_another_file() {
 
     // Read each line from the source file and parse it
     while (fgets(buffer, sizeof(buffer), source_file) != NULL) {
-        if (sscanf(buffer, "%d-%d-%d-[", &process_id, &program_counter, &int_quantity) == 3) {
+        if (sscanf(buffer, "%d.%d.%d.[", &process_id, &program_counter, &int_quantity) == 3) {
             int i = 0;
             char *ptr = buffer;
 
@@ -460,7 +460,7 @@ void read_and_write_to_another_file() {
             process_data(process_id, program_counter, int_quantity, memory_vector);
 
             // Optionally, write the parsed data to the destination file in the desired format
-            fprintf(destination_file, "%d-%d-%d-[", process_id, program_counter, int_quantity);
+            fprintf(destination_file, "%d.%d.%d.[", process_id, program_counter, int_quantity);
             for (int j = 0; j < int_quantity; j++) {
                 if (j > 0) fprintf(destination_file, ",");
                 fprintf(destination_file, "%d", memory_vector[j]);
@@ -487,7 +487,7 @@ void write_process_to_file(int process_id, int program_counter, int int_quantity
     char formatted_output[1024]; // Adjust size as needed
 
     // Start formatting the output
-    int offset = sprintf(formatted_output, "%d-%d-%d-[", process_id, program_counter, int_quantity);
+    int offset = sprintf(formatted_output, "%d.%d.%d.[", process_id, program_counter, int_quantity);
 
     // Append the contents of the memory vector to the formatted string
     for (int i = 0; i < int_quantity; i++) {
