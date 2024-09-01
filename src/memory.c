@@ -12,8 +12,8 @@ void initialize_memory(Memory *memory, alocationVector *vect) {
 }
 
 void show_memory(Memory memory) {
-    printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
-    printf("\nEstado da memória:\n" RESET);
+    printf(BOLD YELLOW "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n" RESET);
+    printf(BOLD MAGENTA"\nEstado da memória:\n" RESET);
     for (int i = 0; i < MAX_TAM; i++) {
         if (i % 10 == 0) {
             printf("\n");
@@ -21,5 +21,5 @@ void show_memory(Memory memory) {
 
         printf(i < 10 ? "[0%d]: %-3d " : "[%d]: %-3d ", i, memory.data[i]);
     }
-    printf("\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n");
+    printf(BOLD YELLOW "\n\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n" RESET);
 }

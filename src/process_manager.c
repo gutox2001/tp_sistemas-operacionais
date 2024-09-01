@@ -134,12 +134,18 @@ void run_selected_escalonador(ProcessManager *process_manager, CPU *cpu, char *r
 int run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process, char current_command, int selected_escalonador, char *input_command_string, int *command_index, alocationVector *vect, last *ult, int type_alocacao) {
     TypeItem new_item;
     SimulatedProcess new_simulated_process;
+    ItemProcess process_table_item;
     int command_response = 1;
+    Instruction current_instruction;
 
     switch (current_command) {
         case 'U': {
             // Executar a próxima instrução do processo
-            Instruction current_instruction = process->simulated_process.process_instructions[process->program_counter];
+            printf("\nProgram Counter do processo atual: %d\n", process->program_counter);
+
+            current_instruction = process->simulated_process.process_instructions[process->program_counter];
+            // show_simulated_process(process->simulated_process);
+
             printf(BLUE "\nInstrução atual: %c; Indice: %d\n" RESET, current_instruction.instruction_char, current_instruction.index);
 
             switch (current_instruction.instruction_char) {
@@ -152,8 +158,8 @@ int run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, I
                     cpu->quantum++;
 
                     printf("Instrução %c executada com sucesso no processo %d\n", current_instruction.instruction_char, process->id);
-                    alocation_manager(cpu->memory,*process,vect,ult, type_alocacao);
-                    
+                    alocation_manager(cpu->memory, *process, vect, ult, type_alocacao);
+
                     break;
 
                 case 'D':
@@ -191,13 +197,17 @@ int run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, I
 
                     show_cpu(*cpu);
                     show_memory(*process_manager->cpu_list[0].memory);
+
                     remove_item_from_fila(&process_manager->ExecutionState);
                     remove_process_from_table(process->id, &process_manager->process_table);
+
+                    show_fila(&process_manager->ExecutionState);
 
                     clean_cpu(cpu);
 
                     // Troca para o próximo processo pronto
-                    escalona_by_priority(process_manager, cpu, input_command_string, command_index);
+                    run_selected_escalonador(process_manager, cpu, input_command_string, selected_escalonador, command_index);
+
                     printf("Instrução %c executada com sucesso no processo %d\n", current_instruction.instruction_char, process->id);
 
                     break;
@@ -217,9 +227,15 @@ int run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, I
 
                     create_new_item_process(process->id, new_process_program_counter, new_simulated_process, new_simulated_process.priority, &process_manager->process_table);
 
+                    process_table_item = process_manager->process_table.item_process[process_manager->process_table.last_item - 1];
+
+                    if (new_simulated_process.program_counter > 0) {
+                        alocation_manager(cpu->memory, process_table_item, vect, ult, type_alocacao);
+                    }
+
                     // Adicionar o novo processo na fila de prontos
                     new_item.priority = &process_manager->process_table.item_process[process_manager->process_table.last_item].priority;
-                    new_item.process_table_index = process_manager->process_table.last_item-1;
+                    new_item.process_table_index = process_manager->process_table.last_item - 1;
 
                     add_item_to_fila(new_item, &process_manager->ReadyState);
                     process_manager->process_table.item_process[new_item.process_table_index].process_state = Pronto;
@@ -334,7 +350,8 @@ void run_commands(ProcessManager *process_manager, char *input_command_string, i
     }
 
     do {
-        show_fila(&process_manager->ExecutionState);
+        // show_fila(&process_manager->ExecutionState);
+
         current_command = input_command_string[*command_index];
         printf("\nComando atual a ser executado: %c\nIndice do comando: %d\n", current_command, *command_index);
 
@@ -351,7 +368,9 @@ void run_commands(ProcessManager *process_manager, char *input_command_string, i
             } else {
                 current_process = process_cpu->actual_process;
 
-                printf("\nProcesso em execução no momento: %d", current_process->id);
+                printf(BOLD BLUE "\nProcesso em execução no momento: %d" RESET, current_process->id);
+                // printf("\nChar comando passado para o run_command_: %c\n", current_command);
+
                 command_response = run_command_in_selected_process(process_manager, process_cpu, current_process, current_command, selected_escalonador, input_command_string, command_index, vect, ult, type_alocacao);
 
                 if (command_response == 1) {

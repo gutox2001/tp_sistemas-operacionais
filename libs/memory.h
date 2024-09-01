@@ -3,6 +3,8 @@
 
 #define MAX_TAM 100
 
+#include "colors.h"
+
 typedef struct Memory
 {
     int data[MAX_TAM];

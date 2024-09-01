@@ -117,4 +117,6 @@ int run_instruction(CPU *cpu, int mem_index, char instruction, int value, alocat
             return 1;
             break;
     }
+
+    show_memory(*cpu->memory);
 }
