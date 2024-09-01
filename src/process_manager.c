@@ -110,6 +110,7 @@ void escalona_fcfs(ProcessManager *process_manager, CPU *cpu, char *receive_stri
             // Alocar processo na memória
             
             alocation_manager(memory, process_manager->process_table.item_process[next_process_index], alocvect, ult, type_alocacao, &(process_manager->process_table), &(process_manager->ReadyState), &(process_manager->BlockedState), &(process_manager->ExecutionState));
+
         }
         
         // Realiza a troca de contexto, passando o novo processo para a CPU
