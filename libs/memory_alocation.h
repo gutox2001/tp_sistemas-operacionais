@@ -19,6 +19,7 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvec
 int deallocation_manager(Memory *mem, int process_id, alocationVector *alocvect);
 double calculate_average_allocation_time(int num_allocations);
 void write_process_to_file(int process_id, int program_counter, int int_quantity, int *memory_vector);
+void read_and_write_to_another_file();
 void escreverNoArquivo(const char *conteudo);
 
 #endif // MEMORY_ALOCATION_H

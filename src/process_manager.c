@@ -108,6 +108,7 @@ void escalona_fcfs(ProcessManager *process_manager, CPU *cpu, char *receive_stri
         }
         if (is_in_memory == 0){
             // Alocar processo na memória
+            
             alocation_manager(memory, process_manager->process_table.item_process[next_process_index], alocvect, ult, type_alocacao, &(process_manager->process_table), &(process_manager->ReadyState), &(process_manager->BlockedState), &(process_manager->ExecutionState));
         }
         

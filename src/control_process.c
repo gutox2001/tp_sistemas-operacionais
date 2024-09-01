@@ -76,7 +76,7 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
         process_manager.process_table.item_process[0].process_state = Execucao;
 
         // Instancia o primeiro processe simulado
-        first_simulated_process = initialize_simulated_process("data/teste25.txt", 1);
+        first_simulated_process = initialize_simulated_process("data/arquivo.txt", 1);
         // Percorre a string de entrada passando os comandos para o gerenciador de processos
         create_new_item_process(0, 0, first_simulated_process, 0, &process_manager.process_table);
         new_item.process_table_index = 1;

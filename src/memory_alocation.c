@@ -245,9 +245,6 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvec
     ItemProcess temp_item_process;
     temp_item_process.id = -1;
 
-    int vetor_processo_memoria[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    
-    write_process_to_file(12, 13, 10, vetor_processo_memoria);
     // Seleciona a estratégia de alocação
     switch (type_alocacao) {
         case 1:
@@ -295,9 +292,11 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvec
             }
         }
 
-       
-
+        write_process_to_file(temp_item_process.id, process_table->item_process[temp_item_process.id].program_counter, process_table->item_process[temp_item_process.id].simulated_process.int_quantity, vetor_processo_memoria);
         deallocation_manager(mem, temp_item_process.id, alocvect);
+        read_and_write_to_another_file();
+
+
 
         // Tentar alocar novamente
         int ret = alocation_manager(mem, process, alocvect, ult, type_alocacao, process_table, fila_prontos, fila_bloqueados, fila_execucao);
@@ -416,6 +415,72 @@ void escreverNoArquivo(const char *conteudo) {
     printf("Conteúdo escrito no arquivo %s com sucesso.\n", nomeDoArquivo);
 }
 
+
+void process_data(int process_id, int program_counter, int int_quantity, int *memory_vector) {
+    printf("Processing data for Process ID: %d\n", process_id);
+}
+
+
+
+void read_and_write_to_another_file() {
+    FILE *source_file = fopen("Disco.txt", "r");
+    if (source_file == NULL) {
+        printf("Erro ao abrir o arquivo Disco.txt para leitura.\n");
+        return;
+    }
+
+    FILE *destination_file = fopen("Leituradisco.txt", "a");
+    if (destination_file == NULL) {
+        printf("Erro ao abrir o arquivo Leituradisco.txt para escrita.\n");
+        fclose(source_file);  // Close the source file before returning
+        return;
+    }
+
+    char buffer[1024];  // Adjust the size of the buffer if necessary
+    int process_id, program_counter, int_quantity;
+    int memory_vector[100];  // Adjust size based on expected maximum
+
+    // Read each line from the source file and parse it
+    while (fgets(buffer, sizeof(buffer), source_file) != NULL) {
+        if (sscanf(buffer, "%d-%d-%d-[", &process_id, &program_counter, &int_quantity) == 3) {
+            int i = 0;
+            char *ptr = buffer;
+
+            // Find the start of the memory vector after '['
+            ptr = strchr(ptr, '[') + 1;
+
+            // Read each integer into memory_vector
+            while (*ptr != ']' && i < int_quantity) {
+                sscanf(ptr, "%d", &memory_vector[i]);
+                i++;
+                ptr = strchr(ptr, ',') ? strchr(ptr, ',') + 1 : ptr + 1;  // Move to next number or end
+            }
+
+            // Call the processing function with the extracted data
+            process_data(process_id, program_counter, int_quantity, memory_vector);
+
+            // Optionally, write the parsed data to the destination file in the desired format
+            fprintf(destination_file, "%d-%d-%d-[", process_id, program_counter, int_quantity);
+            for (int j = 0; j < int_quantity; j++) {
+                if (j > 0) fprintf(destination_file, ",");
+                fprintf(destination_file, "%d", memory_vector[j]);
+            }
+            fprintf(destination_file, "]\n");
+        }
+    }
+
+    // Close both files
+    fclose(source_file);
+    fclose(destination_file);
+
+    // Clear the contents of the source file after processing
+    source_file = fopen("Disco.txt", "w");  // Open in write mode to clear contents
+    if (source_file != NULL) {
+        fclose(source_file);  // Immediately close after clearing contents
+    }
+
+    printf("Leitura, escrita e limpeza do arquivo concluídas com sucesso.\n");
+}
 
 void write_process_to_file(int process_id, int program_counter, int int_quantity, int *memory_vector) {
     // Create a buffer to hold the formatted output
