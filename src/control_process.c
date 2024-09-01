@@ -25,7 +25,9 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
         int index_mem_end = index_mem_init + 50;
         initialize_cpu(&CPU_list[i], &memory, index_mem_init, index_mem_end);
     }
-
+    for (int i = 0;i<300;i++){
+        vect.endressAdress[i]=-1;
+    }
     /* Criando nosso Pipe */
     if (pipe(fd) == -1) {
         perror("pipe error");

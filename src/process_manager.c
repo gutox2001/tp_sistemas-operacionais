@@ -151,7 +151,9 @@ void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, 
                     cpu->quantum++;
 
                     printf("Instrução %c executada com sucesso no processo %d\n", current_instruction.instruction_char, process->id);
-                    alocation_manager(cpu->memory,*process,vect,ult, type_alocacao);
+                    alocation_manager(cpu->memory, *process, vect, ult, type_alocacao, &(process_manager->process_table), &(process_manager->ReadyState), &(process_manager->BlockedState), &(process_manager->ExecutionState));
+
+                   
                     
                     break;
 
