@@ -10,8 +10,8 @@
 typedef struct CPU {
     int program_counter;  // Contador de programa da CPU
     Memory *memory;
-    int index_mem_init; // Índice de início da memória
-    int index_mem_end;  // Índice de fim da memória
+    // int index_mem_init; // Índice de início da memória
+    // int index_mem_end;  // Índice de fim da memória
     int quantum;  // Quantidade de fatias de tempo usadas pelo processo
     int used_time;     // Quantidade de fatias de tempo da CPU
     int quant_int;     // Quantidade de inteiros usados pelo processo

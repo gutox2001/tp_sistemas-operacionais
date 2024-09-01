@@ -14,4 +14,6 @@ typedef struct vector {
 
 void initialize_memory(Memory *memory, alocationVector *vect);
 
+void show_memory(Memory memory);
+
 #endif // MEMORY_H

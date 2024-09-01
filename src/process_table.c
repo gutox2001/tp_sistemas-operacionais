@@ -95,13 +95,11 @@ void show_process_table(ProcessTable process_table) {
                process_table.item_process[i].process_state);
     }
 
-    printf(BOLD "+----+------+------------+--------+\n" RESET);
+    // printf(BOLD "+----+------+------------+--------+\n" RESET);
 
-    for(int i = 0; i < process_table.last_item; i++){
-        show_item_process(process_table.item_process[i]);
-    }
-
-    
+    // for(int i = 0; i < process_table.last_item; i++){
+    //     show_item_process(process_table.item_process[i]);
+    // }
 }
 
 int get_first_empty_position(ProcessTable *process_table) {
