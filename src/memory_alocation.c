@@ -360,6 +360,7 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvec
     }
 
     // Libera a memória alocada
+    result=NULL;
     free(result);
 
     return 0;
