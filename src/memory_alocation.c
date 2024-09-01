@@ -273,6 +273,7 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvec
             puts("Erro de escolha de alocacao");
             return -1;
     }
+    
 
     // Verifica se a alocação foi bem-sucedida
     if (result[0] == -1) {
@@ -286,13 +287,34 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvec
         }
         temp_item_process = process_table->item_process[index_process_at_process_table];
         printf("Processo mais antigo: %d\n", temp_item_process.id);
-        // Retirar da memória
-        deallocation_manager(mem, temp_item_process.id, alocvect);
         // Chamar alocationManager novamente
         alocation_manager(mem, process, alocvect, ult, type_alocacao, process_table, fila_prontos, fila_bloqueados, fila_execucao);
-        // TODO Salvar processo na lista de prontos
-        // TODO Descobrir de o processo pronto está na memória
-        // TODO Alocar processo na memória
+        // Salvar processo na lista de prontos
+        TypeItem new_item;
+        *new_item.priority = temp_item_process.priority;
+        new_item.process_table_index = index_process_at_process_table;
+        add_item_to_fila(new_item, fila_prontos);
+        // Salvar processo em disco
+        temp_item_process.id; // ID do processo
+        temp_item_process.simulated_process.program_counter; // linha 
+        temp_item_process.simulated_process.int_quantity; // quantidade de inteiros
+        int vetor_processo_memoria[process.simulated_process.int_quantity];
+        for(int i = 0; i < 300; i+= 3){
+            if(alocvect->endressAdress[i] == temp_item_process.id){
+                for(int j = 0; j < process.simulated_process.int_quantity; j++){
+                    vetor_processo_memoria[j] = mem->data[alocvect->endressAdress[i+1+j]];
+                }
+            }
+        }
+        //id->linha-> tam:5-> [32,2,1,-1,4]
+
+        //escreverNoArquivo("%d-%d-%d-", temp_item_process.id, temp_item_process.simulated_process.program_counter, temp_item_process.simulated_process.int_quantity, vetor_processo_memoria);
+        // Retirar da memória
+
+        /*write_process_to_file(temp_item_process.id, temp_item_process.simulated_process.program_counter, 
+                          temp_item_process.simulated_process.int_quantity, vetor_processo_memoria);*/
+
+        deallocation_manager(mem, temp_item_process.id, alocvect);
         puts("Falha na alocação");
         return -1;
     }

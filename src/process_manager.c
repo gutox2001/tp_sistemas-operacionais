@@ -93,14 +93,24 @@ void escalona_by_priority(ProcessManager *process_manager, CPU *cpu, char *recei
     }
 }
 
-void escalona_fcfs(ProcessManager *process_manager, CPU *cpu, char *receive_string, int *command_index) {
-    // TODO: implementar Escalonamento FCFS
+void escalona_fcfs(ProcessManager *process_manager, CPU *cpu, char *receive_string, int *command_index, Memory *memory, alocationVector *alocvect, last *ult, int type_alocacao) {
     // Não precisa ordenar a fila de processos prontos, pois o escalonamento é FCFS
 
     // Se houver um processo pronto para executar
+    // Descobrir de o processo pronto está na memória
     if (!is_fila_empty(process_manager->ReadyState)) {
         pid_t next_process_index = process_manager->ReadyState.start->item.process_table_index;
-
+        int is_in_memory = 0;
+        for(int i = 0; i < 300; i+=3){
+            if(alocvect->endressAdress[i] == next_process_index){
+                is_in_memory = 1;
+            }
+        }
+        if (is_in_memory == 0){
+            // Alocar processo na memória
+            alocation_manager(memory, process_manager->process_table.item_process[next_process_index], alocvect, ult, type_alocacao, &(process_manager->process_table), &(process_manager->ReadyState), &(process_manager->BlockedState), &(process_manager->ExecutionState));
+        }
+        
         // Realiza a troca de contexto, passando o novo processo para a CPU
         troca_de_contexto(process_manager, cpu, Pronto, receive_string, 1, command_index);
         return;
@@ -115,14 +125,14 @@ void escalona_fcfs(ProcessManager *process_manager, CPU *cpu, char *receive_stri
     }
 }
 
-void run_selected_escalonador(ProcessManager *process_manager, CPU *cpu, char *receive_string, int selected_escalonador, int *command_index) {
+void run_selected_escalonador(ProcessManager *process_manager, CPU *cpu, char *receive_string, int selected_escalonador, int *command_index, Memory *memory, alocationVector *alocvect, last *ult, int type_alocacao) {
     switch (selected_escalonador) {
         case 1:
             escalona_by_priority(process_manager, cpu, receive_string, command_index);
             break;
 
         case 2:
-            escalona_fcfs(process_manager, cpu, receive_string, command_index);
+            escalona_fcfs(process_manager, cpu, receive_string, command_index, memory, alocvect, ult, type_alocacao);
             break;
 
         default:
@@ -131,7 +141,7 @@ void run_selected_escalonador(ProcessManager *process_manager, CPU *cpu, char *r
     }
 }
 
-void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process, char current_command, int selected_escalonador, char *input_command_string, int *command_index, alocationVector *vect, last *ult, int type_alocacao) {
+void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, ItemProcess *process, char current_command, int selected_escalonador, char *input_command_string, int *command_index, alocationVector *vect, last *ult, int type_alocacao, Memory *memory) {
     TypeItem new_item;
     SimulatedProcess new_simulated_process;
 
@@ -231,7 +241,7 @@ void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, 
                     // Verifica se há CPU disponível
                     int index_free_cpu = is_any_cpu_available(process_manager);
 
-                    run_selected_escalonador(process_manager, &process_manager->cpu_list[index_free_cpu], input_command_string, selected_escalonador, command_index);
+                    run_selected_escalonador(process_manager, &process_manager->cpu_list[index_free_cpu], input_command_string, selected_escalonador, command_index, memory, vect, ult, type_alocacao);
 
                     printf("Instrução %c executada com sucesso no processo %d\n", current_instruction.instruction_char, process->id);
 
@@ -254,9 +264,9 @@ void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, 
                     // Verifica se há CPU disponível
                     index_free_cpu = is_any_cpu_available(process_manager);
                     if (index_free_cpu != -1) {
-                        run_selected_escalonador(process_manager, &process_manager->cpu_list[index_free_cpu], input_command_string, selected_escalonador, command_index);
+                        run_selected_escalonador(process_manager, &process_manager->cpu_list[index_free_cpu], input_command_string, selected_escalonador, command_index, memory, vect, ult, type_alocacao);
                     } else {
-                        run_selected_escalonador(process_manager, cpu, input_command_string, selected_escalonador, command_index);
+                        run_selected_escalonador(process_manager, cpu, input_command_string, selected_escalonador, command_index, memory, vect, ult, type_alocacao);
                     }
 
                     printf("Instrução %c executada com sucesso no processo %d\n", current_instruction.instruction_char, process->id);
@@ -304,7 +314,8 @@ void run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, 
     }
 }
 
-void run_commands(ProcessManager *process_manager, char *input_command_string, int selected_escalonador, int *command_index, alocationVector *vect, last *ult, int type_alocacao) {
+void run_commands(ProcessManager *process_manager, char *input_command_string,
+ int selected_escalonador, int *command_index, alocationVector *vect, last *ult, int type_alocacao, Memory *memory) {
     int index_free_cpu;
 
     printf("Lista de comandos: %s\n", input_command_string);
@@ -344,7 +355,7 @@ void run_commands(ProcessManager *process_manager, char *input_command_string, i
                 current_process = process_cpu->actual_process;
 
                 printf("\nProcesso em execução no momento: %d", current_process->id);
-                run_command_in_selected_process(process_manager, process_cpu, current_process, current_command, selected_escalonador, input_command_string, command_index, vect, ult, type_alocacao);
+                run_command_in_selected_process(process_manager, process_cpu, current_process, current_command, selected_escalonador, input_command_string, command_index, vect, ult, type_alocacao, memory);
 
                 printf("Voltou aqui\n");
             }

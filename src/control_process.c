@@ -101,7 +101,7 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
 
         // add_process_to_cpu(&process_manager.cpu_list[1], &process_manager.process_table.item_process[2]);
         
-        run_commands(&process_manager, receive_string, selected_escalonador, &command_index, &vect, &ult, type_alocacao);
+        run_commands(&process_manager, receive_string, selected_escalonador, &command_index, &vect, &ult, type_alocacao, &memory);
         // return;
     }
 
