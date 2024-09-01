@@ -22,4 +22,5 @@ void show_memory(Memory memory) {
         printf(i < 10 ? "[0%d]: %-3d " : "[%d]: %-3d ", i, memory.data[i]);
     }
     printf(BOLD YELLOW "\n\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n" RESET);
+    fflush(stdout);
 }

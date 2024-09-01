@@ -3,51 +3,64 @@
 int nos_atravessados=0;
 int cont_disco = 0;
 
-int *first_fit(Memory *memory, int sizeneeded, alocationVector *alocvect){
+int *first_fit(Memory *memory, int sizeneeded, alocationVector *alocvect)
+{
     int position_found = -1;
     int index = 0;
     int i = 0;
     int flag = 0;
-    int *beginend= (int *)calloc(2,sizeof(int));
-    beginend[0]=-1;
-    beginend[1]=-1;
-    
-    while(index<(sizeof(memory->data)/sizeof(int))){
-        if(memory->data[index] == -1){
-            for(int i = 1;i < 300;i+=3){ //e assim mesmo confia
-                if(alocvect->endressAdress[i] <= index && alocvect->endressAdress[i+1] >= index){
-                    flag=-1;
-                    index=alocvect->endressAdress[i+1] +1;
+    int *beginend = (int *)calloc(2, sizeof(int));
+    beginend[0] = -1;
+    beginend[1] = -1;
+
+    // puts("----------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    while (index < (sizeof(memory->data) / sizeof(int)))
+    {
+        if (memory->data[index] == -1)
+        {
+            // Verificação de intervalo
+            for (int j = 1; j < 300; j += 3)
+            {
+                if (alocvect->endressAdress[j] <= index && alocvect->endressAdress[j + 1] >= index)
+                {
+                    flag = -1;
+                    index = alocvect->endressAdress[j + 1] + 1;
+                    break;
                 }
             }
-            if(flag != -1){
-                nos_atravessados++;
-                position_found = index;
-                for(i = index; i<(index + sizeneeded); i++){
-                    if(memory->data[index]!=-1){
-                        position_found = -1;
-                        break;
-                    }
-                }
-                if(i==sizeneeded){
-                    /*for(i = index; i<(index + sizeneeded); i++){
-                    memory->data[i]=1;
-                    }*/
-                    beginend[0]=position_found;
-                    beginend[1]=position_found+sizeneeded;
-                    return beginend;
 
-
-                }
-                index=i+1;
-                i=0;
+            if (flag == -1)
+            {
+                flag = 0;
+                continue;
             }
-            flag=0;
-            
+
+            // Se encontrado espaço inicial, verifique se há espaço suficiente
+            position_found = index;
+            for (i = index; i < (index + sizeneeded); i++)
+            {
+                if (i >= (sizeof(memory->data) / sizeof(int)) || memory->data[i] != -1)
+                {
+                    position_found = -1;
+                    break;
+                }
+            }
+
+            if (position_found != -1)
+            { // Alocação bem-sucedida
+                beginend[0] = position_found;
+                beginend[1] = position_found + sizeneeded;
+                return beginend;
+            }
+
+            index = i; // Move para o próximo bloco disponível
+        }
+        else
+        {
+            index++;
         }
     }
-    return beginend;
-
+    return beginend; // Retorna -1, -1 se nenhuma alocação for encontrada
 }
 int *next_fit(Memory *memory, int sizeneeded, last *lastfit, alocationVector *alocvect){
     int start_index = lastfit->lastfit;
@@ -379,6 +392,7 @@ int deallocation_manager(Memory *mem, int process_id, alocationVector *alocvect)
         printf("%d ",mem->data[i]);
     }
     printf("\n");
+    fflush(stdout);
 
     return 0;
 }
