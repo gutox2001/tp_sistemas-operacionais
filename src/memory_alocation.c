@@ -270,10 +270,10 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvec
         if(index_process_at_process_table == -1) {
             index_process_at_process_table = remove_item_from_fila(fila_prontos);
         }
-        if(index_process_at_process_table == -1) {
+        else if(index_process_at_process_table == -1) {
             index_process_at_process_table = remove_item_from_fila(fila_execucao);
         }
-        if(index_process_at_process_table == -1) {
+        else if(index_process_at_process_table == -1) {
             puts("Nenhum processo disponível para remoção");
             return -1;
         }
