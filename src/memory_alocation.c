@@ -1,6 +1,7 @@
 #include "../libs/memory_alocation.h"
 #include "../libs/memory.h"
 int nos_atravessados=0;
+int cont_disco = 0;
 
 int *first_fit(Memory *memory, int sizeneeded, alocationVector *alocvect){
     int position_found = -1;
@@ -11,7 +12,6 @@ int *first_fit(Memory *memory, int sizeneeded, alocationVector *alocvect){
     beginend[0]=-1;
     beginend[1]=-1;
     
-    puts("----------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     while(index<(sizeof(memory->data)/sizeof(int))){
         if(memory->data[index] == -1){
             for(int i = 1;i < 300;i+=3){ //e assim mesmo confia
@@ -263,9 +263,13 @@ int alocation_manager(Memory *mem, ItemProcess process, alocationVector *alocvec
             puts("Erro de escolha de alocacao");
             return -1;
     }
-
+    if (result == NULL) {
+        puts("Falha na alocação de memória");
+        return -1;
+    }
     // Verifica se a alocação foi bem-sucedida
     if (result == NULL || result[0] == -1) {
+        cont_disco++;
         int index_process_at_process_table = remove_item_from_fila(fila_bloqueados);
         if(index_process_at_process_table == -1) {
             index_process_at_process_table = remove_item_from_fila(fila_prontos);
@@ -480,6 +484,10 @@ void read_and_write_to_another_file() {
     }
 
     printf("Leitura, escrita e limpeza do arquivo concluídas com sucesso.\n");
+    double average_nodes_traversed = calculate_average_allocation_time(nos_atravessados);
+    printf("Tempo médio de alocação: %f\n", average_nodes_traversed);
+    printf("Número de alocações no disco: %d\n", cont_disco);
+    //print aqui
 }
 
 void write_process_to_file(int process_id, int program_counter, int int_quantity, int *memory_vector) {
@@ -503,21 +511,4 @@ void write_process_to_file(int process_id, int program_counter, int int_quantity
     // Write the formatted string to the file
     escreverNoArquivo(formatted_output);
 }
-
-/*
-int main(){
-    Memory mem;
-    ItemProcess item;
-
-    alocationVector vect;
-    last ult;
-    for (int i = 0; i < MAX_TAM * 3; i++){
-        vect.endressAdress[i]=-1;
-    }
-    initialize_memory(&mem);
-    alocation_manager(&mem,item,&vect,&ult);
- 
-
-    return 0;
-}*/
 
