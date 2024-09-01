@@ -66,7 +66,7 @@ void show_fila(TypeFila *fila) {
     }
 
     Cell *aux = fila->start;
-    printf("\nImprimindo fila...");
+    printf("\nImprimindo fila...\n");
 
     while (aux != NULL) {
         printf("Dados do Item:\n");

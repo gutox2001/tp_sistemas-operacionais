@@ -88,7 +88,7 @@ void initialize_control_process(int type_input, int type_escalonamento, char *se
 
         add_process_to_cpu(&process_manager.cpu_list[0], &process_manager.process_table.item_process[1]);
 
-        // Instancia o segundo processe simulado TESTE!
+        //Instancia o segundo processe simulado TESTE!
         // second_simulated_process = initialize_simulated_process("data/first_process.txt", 2);
         // // Percorre a string de entrada passando os comandos para o gerenciador de processos
         // create_new_item_process(1, 0, second_simulated_process, 0, &process_manager.process_table);
