@@ -69,10 +69,10 @@ void show_fila(TypeFila *fila) {
     printf("\nImprimindo fila...\n");
 
     while (aux != NULL) {
-        printf("Dados do Item:\n");
-        printf("Índice na fila: %d\n", aux->index);
-        printf("Índice na tabela de processos: %d\n", aux->item.process_table_index);
-        printf("Prioridade: %d\n", *aux->item.priority);
+        //printf("Dados do Item:\n");
+        //printf("Índice na fila: %d\n", aux->index);
+        //printf("Índice na tabela de processos: %d\n", aux->item.process_table_index);
+        //printf("Prioridade: %d\n", *aux->item.priority);
         fflush(stdout);
         aux = aux->next_cell;
     }

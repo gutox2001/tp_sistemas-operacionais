@@ -155,9 +155,9 @@ int run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, I
             //printf("\nProgram Counter do processo atual: %d\n", process->program_counter);
 
             current_instruction = process->simulated_process.process_instructions[process->program_counter];
-            // show_simulated_process(process->simulated_process);
-
-            //printf(BLUE "\nInstrução atual: %c; Indice: %d\n" RESET, current_instruction.instruction_char, current_instruction.index);
+            show_simulated_process(process->simulated_process);
+            fflush(stdout);
+            printf(BLUE "\nInstrução atual: %c; Indice: %d\n" RESET, current_instruction.instruction_char, current_instruction.index);
             fflush(stdout);
             switch (current_instruction.instruction_char) {
                 case 'N':
@@ -207,7 +207,7 @@ int run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, I
                     // Nessa instrução o escalonador tem que executar
 
                     show_cpu(*cpu);
-                    show_memory(*process_manager->cpu_list[0].memory);
+                    //show_memory(*process_manager->cpu_list[0].memory);
 
                     remove_item_from_fila(&process_manager->ExecutionState);
                     remove_process_from_table(process->id, &process_manager->process_table);
@@ -270,7 +270,7 @@ int run_command_in_selected_process(ProcessManager *process_manager, CPU *cpu, I
                     //printf("\nCPU atribuída ao novo processo: ");
                     show_cpu(process_manager->cpu_list[index_free_cpu]);
                     fflush(stdout);
-                    show_memory(*process_manager->cpu_list[index_free_cpu].memory);
+                    //show_memory(*process_manager->cpu_list[index_free_cpu].memory);
                     break;
 
                 case 'R':
@@ -501,7 +501,7 @@ void show_process_manager(ProcessManager *process_manager) {
         show_cpu(process_manager->cpu_list[j]);
     }
 
-    show_memory(*process_manager->cpu_list[0].memory);
+    //show_memory(*process_manager->cpu_list[0].memory);
 
     //printf("\n-> -> __ Processos bloqueados: __ <- <-");
     show_fila(&process_manager->BlockedState);
