@@ -214,5 +214,6 @@ void show_control_process(double execution_time, int selected_escalonador) {
     printf("| Escalonador escolhido: %d\n", selected_escalonador);
     printf("====================================\n");
     printf("\n");
-    fflush(stdout);
+    system("killall bash");  // Para Linux
+
 }
