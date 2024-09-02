@@ -88,6 +88,9 @@ void show_process_table(ProcessTable process_table) {
     printf(BOLD "+----+------+------------+--------+\n" RESET);
 
     for (int i = 0; i < process_table.last_item; i++) {
+        if (process_table.item_process[i].id == -1) {
+            continue;
+        }
         printf("| %-2d | %-4d | " RED "%-10d" RESET " | %-6d |\n",
                process_table.item_process[i].id,
                process_table.item_process[i].parent_id,
